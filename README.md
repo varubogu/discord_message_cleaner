@@ -2,68 +2,67 @@
 
 English | [日本語](README.ja.md)
 
-This is a Discord bot that periodically deletes messages in designated channels.
+A Discord bot that periodically deletes messages in designated channels.
 
 ## Features
 
 - Set target channels for deletion
-- Remove target channels from deletion list
-- Exclusion settings
-- Remove exclusion settings
-- View current server settings
+- Remove channels from deletion targets
+- Set exclusions
+- Remove exclusions
+- View settings within the server
 - Delete all messages in a channel
 
 ## Feature Details
 
 ### Set Target Channels for Deletion
 
-Set the channels to be monitored for deletion. A confirmation message is displayed after the command is executed, and the setting is completed by pressing the approval button within one minute to prevent accidental deletions. If the same channel is set again, the setting will be overwritten. Excluded messages will not be deleted.
+Set the channels to be monitored. To prevent accidental deletions, a confirmation message is displayed after executing the command. Press the Ok button within 10 seconds to complete the setting. If the same channel is set again, the setting will be overwritten. Note that messages with exclusion settings will not be deleted.
 
 ```discord
-/enable [#target-channel] [lifetime]
+/enable [#target_channel] [lifetime]
 ```
 
-#### Parameter ① Target Channel
+#### Parameter ① Target Channel for Deletion
 
-The target channel should be entered in the form of a channel mention (#channel-name). This parameter is required.
+Enter the target channel in the form of a channel mention (#channel_name). This is a required parameter.
 
 #### Parameter ② Lifetime
 
-Specify how long you want to keep messages. Enter the lifetime as follows:
+Specify how long the messages should remain. Enter the lifetime as a string as shown below.
 
 | Input | Duration |
 | --- | --- |
-| 1month | 1 month |
 | 1week | 1 week |
 | 1day | 1 day (24 hours) |
 | 1hour | 1 hour |
 | 1min | 1 minute |
 | 1sec | 1 second |
 
-Multiple combinations can also be specified.
+You can also specify multiple combinations.
 
 | Input | Duration |
 | --- | --- |
 | "1hour30min" | 1 hour 30 minutes |
 | "1day 1hour 30min" | 1 day 1 hour 30 minutes |
 
-This parameter is optional. If omitted, the default is "1day".
+This is an optional parameter. If omitted, "1day" will be set by default.
 
-### Remove Target Channels from Deletion List
+### Remove Target Channels for Deletion
 
-Remove channels from the monitoring list. A confirmation message is displayed after the command is executed, and the setting is completed by pressing the approval button within one minute to prevent accidental deletions.
+Remove channels from the monitoring targets.
 
 ```discord
-/disable {#target-channel}
+/disable {#target_channel}
 ```
 
-#### Parameter ① Target Channel
+#### Parameter ① Target Channel for Removal
 
-The target channel should be entered in the form of a channel mention (#channel-name). This parameter is required.
+Enter the target channel in the form of a channel mention (#channel_name). This is a required parameter.
 
-### Message Exclusion Settings
+### Set Message Exclusions
 
-Specify the message URL or message ID to exclude it from deletion settings.
+Exclude messages from deletion by specifying the message URL or message ID.
 
 ```discord
 /exclude add [msgurl]
@@ -71,11 +70,11 @@ Specify the message URL or message ID to exclude it from deletion settings.
 
 #### Parameter ① Message URL
 
-Specify the message URL. This parameter is required.
+Specify the message URL. This is a required parameter.
 
-### Remove Message Exclusion
+### Remove Message Exclusions
 
-Remove the exclusion settings.
+Remove the set exclusion settings. To prevent accidental deletions, a confirmation message is displayed after executing the command. Press the Ok button within 10 seconds to complete the setting.
 
 ```discord
 /exclude remove [msgurl]
@@ -83,81 +82,82 @@ Remove the exclusion settings.
 
 #### Parameter ① Message URL
 
-Specify the message URL. This parameter is required.
+Specify the message URL. This is a required parameter.
 
-### View Current Server Settings
+### View Settings Within the Server
 
 Display the current settings in the server.
 
 ```discord
-/settings [channel]
+/setttings [channel]
 ```
 
-#### Parameter ① Display Target Channel
+#### Parameter ① Channel to Display
 
-This parameter is optional. If omitted, all settings in the server will be displayed.
+This is an optional parameter. If omitted, all settings within the server will be displayed.
 
 ### Delete All Messages in a Channel
 
-Delete all messages in the target channel. A confirmation message is displayed after the command is executed, and the deletion is carried out by pressing the approval button within one minute to prevent accidental deletions.
+Delete all messages in the specified channel. To prevent accidental deletions, a confirmation message is displayed after executing the command. Press the Ok button within 10 seconds to complete the setting.
 
 ```discord
-/clear {#target-channel}
+/clear {#target_channel}
 ```
 
-#### Parameter ① Target Channel
+#### Parameter ① Target Channel for Deletion
 
-The target channel should be entered in the form of a channel mention (#channel-name). This parameter is required.
+Enter the target channel in the form of a channel mention (#channel_name). This is a required parameter.
 
 ## Required Permissions for the Bot
 
-The bot uses the following permissions:
+The bot requires the following permissions.
 
 | Permission Name | Description |
-|---|---|
-| Manage Messages | Needed to access and delete messages in the target channels |
-| Read Message History | Needed if you want to delete messages from before the bot was added |
+| --- | --- |
+| Manage Messages | Required to access and delete messages in the target channels |
+| Read Message History | Required to delete messages sent before the bot was added |
 
-## Collected Data
+## Data Collection
 
-The bot collects the following data to operate:
+The bot collects the following data for its operation.
 
-| Collected Item | Content |
-|---|---|
-| Server ID, Channel ID | Used to identify the target servers and channels |
-| Message ID | Used to set exclusions (does not read the content or reactions of the messages) |
+| Data Target | Data Content |
+| --- | --- |
+| Server ID, Channel ID | Used to identify the target server and channels |
+| Message ID | Used to set exclusions (the content of the messages or reactions are not read) |
 
-## Permissions for Bot Operations
+## Permissions to Operate the Bot
 
-For security reasons, only server administrators can operate the bot.
+For security reasons, only users with the role "message_cleaner_admin" are allowed to operate this function. The Bot does not automatically generate this role, so an administrator must create it and assign it only to trusted individuals.
+
+Note: Users with this role will effectively have the authority to delete messages from channels that the Bot can access.
 
 ## Development Environment
 
-### Setting Up the Environment
+### Environment Setup
 
-Using devcontainer, basic settings are included.
+The basic settings are summarized in the devcontainer.
 
-1. Clone the source code
+1. Clone the source using git
 2. Prepare environment files in the config folder
    1. .env (copy .env.example)
-   2. .env.db.production (copy .env.db.production and edit DB connection information)
+   2. .env.db.production (copy .env.db.production and edit the DB connection information)
    3. .env.testing (copy .env.example)
-3. Open in VSCode and select "Reopen in Container"
+3. Open with VSCode and select "Reopen in Container"
 
 ### Debug Execution
 
-.vscode/launch.json is prepared, so you can run it directly from the "Run" tab.
+You can run the debugger directly from the "Run" tab as .vscode/launch.json is provided.
 
 ### Test Execution
 
-Using pytest and pytest-asyncio. These environments are automatically created when the devcontainer is built, so tests can be run from the "Test" tab.
+We use pytest and pytest-asyncio. These environments are automatically created during the devcontainer setup, so you can run tests from the "Test" tab.
 
 ## Production Environment
 
 ### Execution
 
-Using docker-compose.
-*Planning to migrate to k8s in the future.*
+We use docker-compose. Note: We plan to migrate to k8s in the future.
 
 Start production environment
 
@@ -165,7 +165,7 @@ Start production environment
 sh prod.up.sh
 ```
 
-To run with cache cleared
+To clear cache and start
 
 ```bash
 sh prod.up.nocache.sh
@@ -177,17 +177,17 @@ To stop
 sh prod.down.sh
 ```
 
-## Libraries and Licenses Used
+## Libraries and Licenses
 
 ### discord.py
 
-- Python wrapper for the Discord API.
+- A Python wrapper for the Discord API.
 - GitHub: [https://github.com/Rapptz/discord.py](https://github.com/Rapptz/discord.py)
 - License: [MIT License](https://github.com/Rapptz/discord.py/blob/master/LICENSE)
 
 ### python-dotenv
 
-- Reads key-value pairs from a .env file and sets them as environment variables.
+- A library to read key-value pairs from a .env file and set them as environment variables.
 - GitHub: [https://github.com/theskumar/python-dotenv](https://github.com/theskumar/python-dotenv)
 - License: [MIT License](https://github.com/theskumar/python-dotenv/blob/main/LICENSE)
 
@@ -199,7 +199,7 @@ sh prod.down.sh
 
 ### sqlalchemy
 
-- SQL toolkit and Object-Relational Mapping library for Python.
+- A SQL toolkit and Object Relational Mapper for Python.
 - GitHub: [https://github.com/sqlalchemy/sqlalchemy](https://github.com/sqlalchemy/sqlalchemy)
 - License: [MIT License](https://github.com/sqlalchemy/sqlalchemy/blob/main/LICENSE)
 
