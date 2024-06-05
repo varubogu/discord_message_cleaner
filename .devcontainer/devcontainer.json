@@ -1,0 +1,94 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/postgres
+{
+	"name": "discord_message_cleaner",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {} //ホストのDockerを使用可能にする
+	},
+	"postCreateCommand": "pip install --no-cache-dir -r requirements.test.txt",
+	"containerEnv": {
+		"PYTHONPATH": "${containerWorkspaceFolder}/src",
+		"SOURCE_FOLDER": "${containerWorkspaceFolder}/src",
+		"CONFIG_FOLDER": "${containerWorkspaceFolder}/config",
+		"DBHOST": "127.0.0.1",
+		"DBUSER": "postgres",
+		"DBPASSWORD": "postgres",
+		"DBDATABASE": "postgres"
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"editor.renderWhitespace": "all",
+				"editor.trimAutoWhitespace": true,
+				"[python]": {
+					"diffEditor.ignoreTrimWhitespace": false,
+					"gitlens.codeLens.symbolScopes": [
+						"!Module"
+					],
+					"editor.formatOnType": true,
+					"editor.codeActionsOnSave": {
+						"source.fixAll.ruff": true,
+						"source.organizeImports.ruff": true
+					},
+					"editor.wordBasedSuggestions": "allDocuments",
+					"bracketLens.mode": "manual"
+				},
+				"[markdown]": {
+					"editor.unicodeHighlight.ambiguousCharacters": false,
+					"editor.unicodeHighlight.invisibleCharacters": false,
+					"diffEditor.ignoreTrimWhitespace": false,
+					"editor.wordWrap": "on",
+					"editor.quickSuggestions": {
+						"comments": "off",
+						"strings": "off",
+						"other": "off"
+					},
+					"editor.trimAutoWhitespace": false, // 改行のために半角スペース2つが必要
+					"bracketLens.mode": "manual"
+				},
+				"[yaml]": {
+					"editor.insertSpaces": true,
+					"editor.tabSize": 2,
+					"editor.autoIndent": "advanced",
+					"diffEditor.ignoreTrimWhitespace": false,
+					"editor.trimAutoWhitespace": false
+				}
+			},
+			"extensions": [
+				"amazonwebservices.aws-toolkit-vscode",
+				"njpwerner.autodocstring",
+				"kevinglasson.cornflakes-linter",
+				"donjayamanne.githistory",
+				"github.vscode-github-actions",
+				"mhutchie.git-graph",
+				"GitHub.vscode-pull-request-github",
+				"codezombiech.gitignore",
+				"oderwat.indent-rainbow",
+				"magicstack.MagicPython",
+				"yzhang.markdown-all-in-one",
+				"DavidAnson.vscode-markdownlint",
+				"bierner.markdown-preview-github-styles",
+				"ms-ossdata.vscode-postgresql",
+				"ms-azuretools.vscode-docker",
+				"ckolkman.vscode-postgres",
+				"eamodio.gitlens",
+				"streetsidesoftware.code-spell-checker",
+				"charliermarsh.ruff"
+			]
+		}
+	}
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or the host.
+	// "forwardPorts": [5000, 5432],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "pip install --user -r requirements.txt",
+	// Configure tool-specific properties.
+	// "customizations": {},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

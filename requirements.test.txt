@@ -1,0 +1,17 @@
+# bot
+discord.py
+
+# env
+python-dotenv
+
+# db
+asyncpg
+sqlalchemy
+
+# utility
+result
+
+# test
+pytest
+pytest-asyncio
+pytest-mock

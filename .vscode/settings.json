@@ -1,0 +1,21 @@
+{
+    "python.testing.pytestArgs": [
+        "./"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "autouse",
+        "clsobj",
+        "dotenv",
+        "gspread",
+        "paylood",
+        "recruitments",
+        "sqlalchemy",
+        "tablescope",
+        "tabletype"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    // "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.autoImportCompletions": true
+}

@@ -1,0 +1,60 @@
+version: '3.8'
+
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  app:
+    container_name: bot
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+      target: production-image
+    # restart: unless-stopped
+    env_file:
+      - ./config/.env
+      - ./config/.env.timezone
+      - ./config/.env.db.production
+    networks:
+      - app_network
+    depends_on:
+      - db
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    env_file:
+      - ./config/.env.timezone
+      - ./config/.env.db.production
+    ports:
+      - 5432:5432
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DBUSER} -d ${DBDATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  pgdata:

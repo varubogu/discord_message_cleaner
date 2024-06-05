@@ -1,0 +1,18 @@
+# Ignore Python cache
+__pycache__/
+
+# Python cache
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+*.venv/
+
+.pytest_cache/
+
+# environment
+config/*
+!config/*.example
+
+# GCP API Credential
+gcp-credentials.json
