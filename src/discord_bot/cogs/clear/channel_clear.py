@@ -8,6 +8,9 @@ from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
+from discord_bot.utils.environment import get_os_environ_safety
+
+LOOP_DELETE_SIZE = get_os_environ_safety('LOOP_DELETE_SIZE', int, 10)
 
 
 class ChannelClearCog(commands.Cog):
@@ -17,6 +20,9 @@ class ChannelClearCog(commands.Cog):
             bot: commands.Bot
     ):
         self.__bot = bot
+        self.MESSAGE_DELETE_INTERVAL = get_os_environ_safety('MESSAGE_DELETE_INTERVAL', int, 1)
+        self.MAX_SIZE = get_os_environ_safety('MAX_SIZE', int, 100)
+
 
     @property
     def bot(self) -> commands.Bot:
@@ -70,6 +76,17 @@ class ChannelClearCog(commands.Cog):
 
         channel = parameter.channel
 
+        (is_complete, is_deleted) = await self.message_delete(channel, self.MAX_SIZE)
+
+        if not is_deleted:
+            msg = "削除対象がありませんでした。"
+        else:
+            msg = "削除が完了しました。"
+            if not is_complete:
+                msg += f"\n1度に消せるのは{self.MAX_SIZE}件までです。\n続けて削除する場合はもう一度コマンドを実行してください。"
+        await interaction.followup.send(msg, ephemeral=True)
+
+    async def message_delete(self, channel: TextChannel, limit: int = LOOP_DELETE_SIZE):
         async with self.bot.db_lock:
             async with AsyncSessionLocal() as session:
                 remove_range_result = await MonitoringChannels.select_remove_range(session, channel.guild.id, channel.id)
@@ -84,23 +101,19 @@ class ChannelClearCog(commands.Cog):
 
         is_complete = False # ライフタイムと除外メッセージ以外の全てを削除しおえたか
         is_deleted = False # 1件以上削除したか
-        async for m in channel.history(limit=100, oldest_first=True):
+        async for m in channel.history(limit=limit, oldest_first=True):
             if m.id in exclusion_ids:
                 continue
             if remove_range is not None and m.created_at >= remove_range:
                 is_complete = True
                 break
             await m.delete()
+            await asyncio.sleep(self.MESSAGE_DELETE_INTERVAL)
             is_deleted = True
-            await asyncio.sleep(1)
+        return (is_complete, is_deleted)
 
-        if not is_deleted:
-            msg = "削除対象がありませんでした。"
-        else:
-            msg = "削除が完了しました。"
-            if not is_complete:
-                msg += "\n1度に消せるのは100件までです。\n続けて削除する場合はもう一度コマンドを実行してください。"
-        await interaction.followup.send(msg, ephemeral=True)
+    async def test(self):
+        print("hello")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ChannelClearCog(bot))
