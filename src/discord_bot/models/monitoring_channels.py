@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Sequence
 from datetime import datetime
 from result import Result, Ok, Err
 from sqlalchemy import BigInteger, Column, Interval, and_, select, text
@@ -48,6 +48,16 @@ class MonitoringChannels(ModelBase):
             select(MonitoringChannels).filter(
                 MonitoringChannels.guild_id == guild_id
             )
+        )
+        return result.scalars().all()
+
+    @classmethod
+    async def select_all(
+        cls,
+        session: AsyncSession
+    ) -> Sequence['MonitoringChannels']:
+        result = await session.execute(
+            select(MonitoringChannels)
         )
         return result.scalars().all()
 
