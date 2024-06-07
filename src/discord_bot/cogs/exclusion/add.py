@@ -5,6 +5,7 @@ from discord.ext import commands
 from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.utils.discord_helper import DiscordHelper
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.utils.permission import Permission
 from discord_bot.utils.url import UrlUtil
 
 
@@ -68,6 +69,13 @@ class ExclusionAddCog(commands.Cog):
                     await interaction.followup.send(msg, ephemeral=True)
                     return
                 case _:
+                    msg = "メッセージの取得に失敗しました。"
+                    await interaction.followup.send(msg, ephemeral=True)
+                    return
+
+            permission_result = await Permission.is_message_read_permission(interaction.user, channel)
+            match permission_result:
+                case Err(err_value):
                     msg = "メッセージの取得に失敗しました。"
                     await interaction.followup.send(msg, ephemeral=True)
                     return

@@ -1,11 +1,29 @@
 from typing import Optional, Tuple
+import discord
+from result import Result, Ok, Err
 from discord.guild import Guild
 from discord.message import Message
-from result import Result, Ok, Err
-import discord
 from discord.ext import commands
 
 class DiscordHelper:
+
+    @classmethod
+    async def is_message_delete_permission(
+        cls,
+        user: discord.User | discord.Member,
+        channel: discord.TextChannel
+    ) -> Result[None, list[str]]:
+        msg = []
+        a = channel.permissions_for(user)
+        if a.administrator is False:
+            if a.read_message_history is False:
+                msg.append("メッセージ履歴を見る権限がありません。")
+            if a.manage_messages is False:
+                msg.append("メッセージを削除する権限がありません。")
+        if msg == "":
+            return Ok(None)
+        else:
+            return Err(msg)
 
     @classmethod
     async def get_or_fetch_guild(
@@ -47,7 +65,7 @@ class DiscordHelper:
             try:
                 guild = await cls.get_or_fetch_guild(bot, guild_id)
             except discord.Forbidden:
-                msg = "指定されたサーバーへのアクセス権限がありません。"
+                msg = "指定されたサーバーへのアクセス権限がこのBotにありません。"
                 return Err(msg)
             except discord.HTTPException:
                 msg = "処理に失敗しました。再度お試しください。"
@@ -66,7 +84,7 @@ class DiscordHelper:
                 msg = "指定されたチャンネルが存在しません。"
                 return Err(msg)
             except discord.Forbidden:
-                msg = "指定されたチャンネルへのアクセス権限がありません。"
+                msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
                 return Err(msg)
             except discord.HTTPException:
                 msg = "処理に失敗しました。再度お試しください。"
@@ -84,7 +102,7 @@ class DiscordHelper:
                 msg = "指定されたメッセージが存在しません。"
                 return Err(msg)
             except discord.Forbidden:
-                msg = "指定されたメッセージのアクセス権限がありません。"
+                msg = "指定されたメッセージのアクセス権限がこのBotにありません。"
                 return Err(msg)
             except discord.HTTPException:
                 msg = "処理に失敗しました。再度お試しください。"
