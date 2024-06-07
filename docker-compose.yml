@@ -19,7 +19,7 @@ services:
     networks:
       - discord-message-cleaner-network
     depends_on:
-      - discord-message-cleaner-db
+      - db
     logging:
       options:
         max-size: "10m"
@@ -43,8 +43,6 @@ services:
     env_file:
       - ./config/.env.timezone
       - ./config/.env.db.production
-    ports:
-      - 5432:5432
     networks:
       - discord-message-cleaner-network
     healthcheck:
