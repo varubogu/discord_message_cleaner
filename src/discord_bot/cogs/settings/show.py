@@ -122,7 +122,7 @@ class SettingsShowCog(commands.Cog):
         if msg == "":
             msg = "なし"
 
-        embed.add_field(name="除外したURL", value=msg, inline=False)
+        embed.add_field(name="除外したメッセージ", value=msg, inline=False)
         return embed
 
     async def channel_show(
@@ -165,7 +165,7 @@ class SettingsShowCog(commands.Cog):
             url_str = "\n".join([f"{m.jump_url}: {m.id}" for m in messages])
         else:
             url_str = "なし"
-        embed.add_field(name="除外したURL", value=url_str, inline=False)
+        embed.add_field(name="除外したメッセージ", value=url_str, inline=False)
         return embed
 
 
