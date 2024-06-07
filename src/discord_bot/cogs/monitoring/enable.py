@@ -9,6 +9,7 @@ from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
 from discord_bot.utils.lifetime import LifeTimeUtil
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.utils.permission import Permission
 
 
 class EnableCog(commands.Cog):
@@ -56,6 +57,13 @@ class EnableCog(commands.Cog):
                 msg = "ライフタイムが指定されていません。"
                 await interaction.followup.send(msg, ephemeral=True)
                 return
+
+            permission_result = await Permission.is_message_delete_permission(interaction.user, channel)
+            match permission_result:
+                case Err(err_value):
+                    msg = "\n".join(err_value)
+                    await interaction.followup.send(msg, ephemeral=True)
+                    return
 
             msg = f"{channel.mention}を監視対象にしますか？\n" \
                 f"監視対象のチャンネルのメッセージは[{interval}]が経過すると削除されます。" \

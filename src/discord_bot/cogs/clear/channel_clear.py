@@ -8,6 +8,7 @@ from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
+from discord_bot.utils.permission import Permission
 
 
 class ChannelClearCog(commands.Cog):
@@ -40,6 +41,12 @@ class ChannelClearCog(commands.Cog):
             async with self.bot.db_lock:
                 async with AsyncSessionLocal() as session:
                     monitorings = await MonitoringChannels.select(session, channel.guild.id, channel.id)
+            permission_result = await Permission.is_message_delete_permission(interaction.user, channel)
+            match permission_result:
+                case Err(err_value):
+                    msg = "\n".join(err_value)
+                    await interaction.followup.send(msg, ephemeral=True)
+                    return
 
             msg = ""
             if monitorings is None:
