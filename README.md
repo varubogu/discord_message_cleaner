@@ -31,20 +31,23 @@ Enter the target channel in the form of a channel mention (#channel_name). This 
 
 Specify how long the messages should remain. Enter the lifetime as a string as shown below.
 
-| Input | Duration |
-| --- | --- |
-| 1week | 1 week |
-| 1day | 1 day (24 hours) |
-| 1hour | 1 hour |
-| 1min | 1 minute |
-| 1sec | 1 second |
+| Input | Abbreviation | Duration |
+| --- | --- | --- |
+
+| 1week | 1w| 1 week |
+| 1day | 1d | 1 day (24 hours)  |
+| 1hour | 1h | 1 hour |
+| 1min | 1mi | 1 minute |
+| 1sec | 1s | 1 second |
 
 You can also specify multiple combinations.
 
 | Input | Duration |
 | --- | --- |
-| "1hour30min" | 1 hour 30 minutes |
-| "1day 1hour 30min" | 1 day 1 hour 30 minutes |
+| "1week 2day 3hour 4min 5sec" | 9 days 3 hours 4 minutes 5 seconds |
+| "1 day 1 hour 30 min" | 1 day 1 hour 30 minutes |
+| "90mi" | 1 hour 30 minutes |
+| "1h90mi" | 2 hour 30 minutes |
 
 This is an optional parameter. If omitted, "1day" will be set by default.
 
