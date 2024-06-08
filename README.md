@@ -132,8 +132,7 @@ The bot collects the following data for its operation.
 ## Permissions to Operate the Bot
 
 For security reasons, only users with the role "message_cleaner_admin" are allowed to operate this function. The Bot does not automatically generate this role, so an administrator must create it and assign it only to trusted individuals.
-
-Note: Users with this role will effectively have the authority to delete messages from channels that the Bot can access.
+Even if the "message_cleaner_admin" role exists, deletion commands cannot be used unless the command executor has message management permissions. Therefore, it is recommended to grant message management permissions to that role.
 
 ## Development Environment
 
