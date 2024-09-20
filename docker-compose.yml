@@ -1,12 +1,11 @@
 version: '3.8'
 
 networks:
-  discord-message-cleaner-network:
+  dmc-network:
     driver: bridge
 
 services:
   app:
-    container_name: discord-message-cleaner-bot
     build:
       context: .
       dockerfile: Dockerfile.app
@@ -17,7 +16,7 @@ services:
       - ./config/.env.timezone
       - ./config/.env.db.production
     networks:
-      - discord-message-cleaner-network
+      - dmc-network
     depends_on:
       - db
     logging:
@@ -29,7 +28,6 @@ services:
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   db:
-    container_name: discord-message-cleaner-db
     build:
       context: .
       dockerfile: Dockerfile.db
@@ -44,7 +42,7 @@ services:
       - ./config/.env.timezone
       - ./config/.env.db.production
     networks:
-      - discord-message-cleaner-network
+      - dmc-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DBUSER} -d ${DBDATABASE}"]
       interval: 10s
