@@ -32,7 +32,7 @@ class DiscordHelper:
         guild_id: int,
     ) -> Guild:
         return bot.get_guild(guild_id) or await bot.fetch_guild(guild_id)
-    
+
     @classmethod
     async def get_or_fetch_channel_from_bot(
         cls,
