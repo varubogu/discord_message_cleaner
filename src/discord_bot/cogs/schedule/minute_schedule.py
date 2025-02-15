@@ -59,7 +59,13 @@ class MinuteSchedule(commands.Cog):
     ):
         for monitoring in monitoring_channels:
             guild = await DiscordHelper.get_or_fetch_guild(self.bot, monitoring.guild_id)
+            if guild is None:
+                print(f"サーバー取得で例外発生:{monitoring.guild_id}")
+                continue
             channel = await DiscordHelper.get_or_fetch_channel_from_guild(guild, monitoring.channel_id)
+            if channel is None:
+                print(f"チャンネル取得で例外発生:{monitoring.channel_id}")
+                continue
             await self.cleaner.message_delete(channel)
             await asyncio.sleep(self.CHANNEL_DELETE_INTERVAL)
 
