@@ -14,3 +14,6 @@ result
 # # test
 # pytest
 # pytest-asyncio
+
+# Python3.13で動かす場合に必要
+audioop-lts
