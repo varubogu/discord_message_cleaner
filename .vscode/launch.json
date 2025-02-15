@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Bot起動",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}/src/discord_bot",
             "module": "bot",
