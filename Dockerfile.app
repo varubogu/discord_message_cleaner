@@ -1,5 +1,5 @@
 # base image
-FROM python:3.11-slim AS base-image
+FROM python:3.13-slim AS base-image
 
 
 ENV WORK_FOLDER=/app/bot
