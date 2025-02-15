@@ -1,7 +1,9 @@
 import asyncio
 from datetime import datetime
+import traceback
 from typing import Optional, Sequence, Tuple
 from discord.ext import commands, tasks
+from result import Err, Ok
 from sqlalchemy.ext.asyncio import AsyncSession
 from discord_bot.utils.environment import get_os_environ_safety
 from discord_bot.utils.discord_helper import DiscordHelper
@@ -41,7 +43,7 @@ class MinuteSchedule(commands.Cog):
                     monitoring_channels, = await self.inner_db_loop(session, now)
             await self.inner_loop(session, now, monitoring_channels)
         except Exception as e:
-            print(f'schedule.loopで例外発生:{e}')
+            print(f'schedule.loopで例外発生:{e}\n{traceback.format_exc()}')
 
     async def inner_db_loop(
             self,
@@ -57,15 +59,25 @@ class MinuteSchedule(commands.Cog):
             now: datetime,
             monitoring_channels: Sequence[MonitoringChannels]
     ):
+        guild = None
+        channel = None
         for monitoring in monitoring_channels:
-            guild = await DiscordHelper.get_or_fetch_guild(self.bot, monitoring.guild_id)
-            if guild is None:
-                print(f"サーバー取得で例外発生:{monitoring.guild_id}")
-                continue
-            channel = await DiscordHelper.get_or_fetch_channel_from_guild(guild, monitoring.channel_id)
-            if channel is None:
-                print(f"チャンネル取得で例外発生:{monitoring.channel_id}")
-                continue
+            guild_result = await DiscordHelper.get_or_fetch_guild(self.bot, monitoring.guild_id)
+            match guild_result:
+                case Ok(ok_value):
+                    guild = ok_value
+                case Err(err_value):
+                    print(f"サーバー取得で例外発生:guild_id={monitoring.guild_id}, {err_value}")
+                    continue
+
+            channel_result = await DiscordHelper.get_or_fetch_channel_from_guild(guild, monitoring.channel_id)
+            match channel_result:
+                case Ok(ok_value):
+                    channel = ok_value
+                case Err(err_value):
+                    print(f"チャンネル取得で例外発生:guild_id={monitoring.guild_id}, channel_id={monitoring.channel_id}, {err_value}")
+                    continue
+
             await self.cleaner.message_delete(channel)
             await asyncio.sleep(self.CHANNEL_DELETE_INTERVAL)
 

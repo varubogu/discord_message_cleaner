@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 import discord
 from result import Result, Ok, Err
 from discord.guild import Guild
@@ -30,24 +30,63 @@ class DiscordHelper:
         cls,
         bot: commands.Bot,
         guild_id: int,
-    ) -> Guild:
-        return bot.get_guild(guild_id) or await bot.fetch_guild(guild_id)
+    ) -> Result[Guild, str]:
+        guild = bot.get_guild(guild_id)
+        if guild is None:
+            try:
+                guild = await bot.fetch_guild(guild_id)
+                if guild is None:
+                    msg = "指定されたサーバーが存在しません。"
+                    return Err(msg)
+            except discord.Forbidden:
+                msg = "指定されたサーバーへのアクセス権限がこのBotにありません。"
+                return Err(msg)
+            except discord.HTTPException:
+                msg = "サーバーが存在しません(404)"
+                return Err(msg)
+        return Ok(guild)
 
     @classmethod
     async def get_or_fetch_channel_from_bot(
         cls,
         bot: commands.Bot,
         channel_id: int
-    ):
-        return bot.get_channel(channel_id) or await bot.fetch_channel(channel_id)
+    ) -> Result[Any, str]:
+        channel = bot.get_channel(channel_id)
+        if channel is None:
+            try:
+                channel = await bot.fetch_channel(channel_id)
+                if channel is None:
+                    msg = "指定されたチャンネルが存在しません。"
+                    return Err(msg)
+            except discord.Forbidden:
+                msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
+                return Err(msg)
+            except discord.HTTPException:
+                msg = "チャンネルが存在しません(404)"
+                return Err(msg)
+        return Ok(channel)
 
     @classmethod
     async def get_or_fetch_channel_from_guild(
         cls,
         guild: Guild,
         channel_id: int
-    ):
-        return guild.get_channel(channel_id) or await guild.fetch_channel(channel_id)
+    ) -> Result[Any, str]:
+        channel = guild.get_channel(channel_id)
+        if channel is None:
+            try:
+                channel = await guild.fetch_channel(channel_id)
+                if channel is None:
+                    msg = "指定されたチャンネルが存在しません。"
+                    return Err(msg)
+            except discord.Forbidden:
+                msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
+                return Err(msg)
+            except discord.HTTPException:
+                msg = "チャンネルが存在しません(404)"
+                return Err(msg)
+        return Ok(channel)
 
 
     @classmethod
@@ -57,18 +96,29 @@ class DiscordHelper:
         guild_id: Optional[int],
         channel_id: Optional[int],
         message_id: Optional[int]
-    ) -> Result[Tuple[Optional[Guild], Optional[discord.TextChannel], Optional[Message]], str]:
+    ) -> Result[
+        Tuple[Optional[Guild], Optional[discord.TextChannel], Optional[Message]],
+        str
+    ]:
+        guild = None
+        channel = None
+        message = None
 
         if guild_id is None:
             guild = None
         else:
             try:
-                guild = await cls.get_or_fetch_guild(bot, guild_id)
+                guild_result = await cls.get_or_fetch_guild(bot, guild_id)
+                match guild_result:
+                    case Ok(ok_value):
+                        guild = ok_value
+                    case Err(err_value):
+                        return Err(err_value)
             except discord.Forbidden:
                 msg = "指定されたサーバーへのアクセス権限がこのBotにありません。"
                 return Err(msg)
             except discord.HTTPException:
-                msg = "処理に失敗しました。再度お試しください。"
+                msg = "サーバーが存在しません(404)"
                 return Err(msg)
 
         if channel_id is None:
@@ -77,9 +127,15 @@ class DiscordHelper:
 
             try:
                 if guild is None:
-                    channel = await cls.get_or_fetch_channel_from_bot(bot, channel_id)
+                    channel_result = await cls.get_or_fetch_channel_from_bot(bot, channel_id)
                 else:
-                    channel = await cls.get_or_fetch_channel_from_guild(guild, channel_id)
+                    channel_result = await cls.get_or_fetch_channel_from_guild(guild, channel_id)
+
+                match channel_result:
+                    case Ok(ok_value):
+                        channel = ok_value
+                    case Err(err_value):
+                        return Err(err_value)
             except discord.NotFound:
                 msg = "指定されたチャンネルが存在しません。"
                 return Err(msg)
@@ -87,7 +143,7 @@ class DiscordHelper:
                 msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
                 return Err(msg)
             except discord.HTTPException:
-                msg = "処理に失敗しました。再度お試しください。"
+                msg = "チャンネルが存在しません(404)"
                 return Err(msg)
 
         if message_id is None:
@@ -105,7 +161,7 @@ class DiscordHelper:
                 msg = "指定されたメッセージのアクセス権限がこのBotにありません。"
                 return Err(msg)
             except discord.HTTPException:
-                msg = "処理に失敗しました。再度お試しください。"
+                msg = "メッセージが存在しません(404)"
                 return Err(msg)
         result = (guild, channel, message)
         return Ok(result)
