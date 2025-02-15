@@ -114,7 +114,10 @@ class ChannelClearCog(commands.Cog):
             if remove_range is not None and m.created_at >= remove_range:
                 is_complete = True
                 break
-            await m.delete()
+            try:
+                await m.delete()
+            except Exception as e:
+                print(f"メッセージ削除で例外発生:{e}")
             await asyncio.sleep(self.MESSAGE_DELETE_INTERVAL)
             is_deleted = True
         return (is_complete, is_deleted)
