@@ -1,0 +1,34 @@
+{
+    "E0000":{
+        "ja": "不明な理由で失敗しました。",
+        "en": "Unknown reason for failure."
+    },
+    "E0001":{
+        "ja": "Discord API トークンが無効です。",
+        "en": "Discord API token is invalid."
+    },
+    "E0002":{
+        "ja": "Discord API レートリミットに達しました。",
+        "en": "Discord API rate limit reached."
+    },
+    "E0004":{
+        "ja": "サーバー(ギルド)が見つかりません。",
+        "en": "Server(Guild) not found."
+    },
+    "E0005":{
+        "ja": "サーバーにアクセスできません。",
+        "en": "Server access denied."
+    },
+    "E0006":{
+        "ja": "チャンネルが見つかりません。",
+        "en": "Channel not found."
+    },
+    "E0007":{
+        "ja": "チャンネルにアクセスできません。",
+        "en": "Channel access denied."
+    },
+    "E0008":{
+        "ja": "メッセージを削除する権限がありません。",
+        "en": "You do not have permission to delete messages."
+    }
+}
