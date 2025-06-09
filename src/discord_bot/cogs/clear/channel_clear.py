@@ -94,6 +94,10 @@ class ChannelClearCog(commands.Cog):
         await interaction.followup.send(msg, ephemeral=True)
 
     async def message_delete(self, channel: TextChannel, limit: int = LOOP_DELETE_SIZE):
+        if channel is None:
+            print(f"チャンネルが見つかりませんでした。:guild_id={channel.guild.id}, channel_id={channel.id}")
+            return (False, False)
+
         async with self.bot.db_lock:
             async with AsyncSessionLocal() as session:
                 remove_range_result = await MonitoringChannels.select_remove_range(session, channel.guild.id, channel.id)
