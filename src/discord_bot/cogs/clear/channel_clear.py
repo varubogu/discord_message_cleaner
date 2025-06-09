@@ -95,7 +95,7 @@ class ChannelClearCog(commands.Cog):
 
     async def message_delete(self, channel: TextChannel, limit: int = LOOP_DELETE_SIZE):
         if channel is None:
-            print(f"チャンネルが見つかりませんでした。:guild_id={channel.guild.id}, channel_id={channel.id}")
+            print(f"channel_clear.message_deleteでチャンネルが見つかりませんでした。")
             return (False, False)
 
         async with self.bot.db_lock:
@@ -126,8 +126,6 @@ class ChannelClearCog(commands.Cog):
             is_deleted = True
         return (is_complete, is_deleted)
 
-    async def test(self):
-        print("hello")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ChannelClearCog(bot))
