@@ -12,6 +12,9 @@ async def test_failed_reason_code_values():
     assert FailedReasonCode.CHANNEL_NOT_FOUND.value == "E0005"
     assert FailedReasonCode.CHANNEL_ACCESS_DENIED.value == "E0006"
     assert FailedReasonCode.MESSAGE_DELETE_PERMISSION_DENIED.value == "E0007"
+    assert FailedReasonCode.MESSAGE_READ_PERMISSION_DENIED.value == "E0008"
+    assert FailedReasonCode.MESSAGE_NOT_FOUND.value == "E0009"
+    assert FailedReasonCode.MESSAGE_ACCESS_DENIED.value == "E0010"
 
 @pytest.mark.asyncio
 async def test_failed_reason_code_names():
@@ -24,6 +27,9 @@ async def test_failed_reason_code_names():
     assert str(FailedReasonCode.CHANNEL_NOT_FOUND) == "CHANNEL_NOT_FOUND"
     assert str(FailedReasonCode.CHANNEL_ACCESS_DENIED) == "CHANNEL_ACCESS_DENIED"
     assert str(FailedReasonCode.MESSAGE_DELETE_PERMISSION_DENIED) == "MESSAGE_DELETE_PERMISSION_DENIED"
+    assert str(FailedReasonCode.MESSAGE_READ_PERMISSION_DENIED) == "MESSAGE_READ_PERMISSION_DENIED"
+    assert str(FailedReasonCode.MESSAGE_NOT_FOUND) == "MESSAGE_NOT_FOUND"
+    assert str(FailedReasonCode.MESSAGE_ACCESS_DENIED) == "MESSAGE_ACCESS_DENIED"
 
 @pytest.mark.asyncio
 async def test_failed_reason_code_enum():
@@ -39,6 +45,9 @@ async def test_failed_reason_code_enum():
         FailedReasonCode.CHANNEL_NOT_FOUND,
         FailedReasonCode.CHANNEL_ACCESS_DENIED,
         FailedReasonCode.MESSAGE_DELETE_PERMISSION_DENIED,
+        FailedReasonCode.MESSAGE_READ_PERMISSION_DENIED,
+        FailedReasonCode.MESSAGE_NOT_FOUND,
+        FailedReasonCode.MESSAGE_ACCESS_DENIED,
     }
     # 未テストのメンバーを検出
     untested_members = all_members - tested_members
