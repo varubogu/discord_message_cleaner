@@ -11,23 +11,23 @@
         "ja": "Discord API レートリミットに達しました。",
         "en": "Discord API rate limit reached."
     },
-    "E0004":{
+    "E0003":{
         "ja": "サーバー(ギルド)が見つかりません。",
         "en": "Server(Guild) not found."
     },
-    "E0005":{
+    "E0004":{
         "ja": "サーバーにアクセスできません。",
         "en": "Server access denied."
     },
-    "E0006":{
+    "E0005":{
         "ja": "チャンネルが見つかりません。",
         "en": "Channel not found."
     },
-    "E0007":{
+    "E0006":{
         "ja": "チャンネルにアクセスできません。",
         "en": "Channel access denied."
     },
-    "E0008":{
+    "E0007":{
         "ja": "メッセージを削除する権限がありません。",
         "en": "You do not have permission to delete messages."
     }

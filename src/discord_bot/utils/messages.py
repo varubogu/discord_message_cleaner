@@ -1,6 +1,6 @@
 import json
 import aiofiles
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 class Message(BaseModel):
     """メッセージ"""
@@ -9,10 +9,13 @@ class Message(BaseModel):
     en: str
 
 
-class Messages(BaseModel):
+class Messages(RootModel):
     """メッセージ一覧"""
 
-    messages: dict[str, Message]
+    root: dict[str, Message]
+
+    def __getitem__(self, key: str) -> Message:
+        return self.root[key]
 
 
 class SingletonMessages:
@@ -32,4 +35,4 @@ class SingletonMessages:
 
         async with aiofiles.open("messages.json", "r", encoding="utf-8") as f:
             raw = await f.read()
-            return Messages(**json.loads(raw))
+            return Messages.model_validate(json.loads(raw))
