@@ -163,6 +163,14 @@ devcontainerを使用しており、基本的な設定はそこにまとめて�
 ### デバッグ実行
 
 .vscode/launch.json が作ってあるため、そのまま「実行」タブから実行できます。
+DBの実行については、dev.up.shを実行してください。
+
+```bash
+sh dev.up.sh
+```
+
+なお、DBの接続情報はdevcontainer.jsonに記載されている接続情報が使用されます。
+※.env.db.productionではありません
 
 ### テスト実行
 

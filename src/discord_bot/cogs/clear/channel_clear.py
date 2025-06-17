@@ -94,6 +94,10 @@ class ChannelClearCog(commands.Cog):
         await interaction.followup.send(msg, ephemeral=True)
 
     async def message_delete(self, channel: TextChannel, limit: int = LOOP_DELETE_SIZE):
+        if channel is None:
+            print(f"channel_clear.message_deleteでチャンネルが見つかりませんでした。")
+            return (False, False)
+
         async with self.bot.db_lock:
             async with AsyncSessionLocal() as session:
                 remove_range_result = await MonitoringChannels.select_remove_range(session, channel.guild.id, channel.id)
@@ -108,22 +112,31 @@ class ChannelClearCog(commands.Cog):
 
         is_complete = False # ライフタイムと除外メッセージ以外の全てを削除しおえたか
         is_deleted = False # 1件以上削除したか
-        async for m in channel.history(limit=limit, oldest_first=True):
-            if m.id in exclusion_ids:
-                continue
-            if remove_range is not None and m.created_at >= remove_range:
-                is_complete = True
-                break
-            try:
-                await m.delete()
-            except Exception as e:
-                print(f"メッセージ削除で例外発生:{e}")
-            await asyncio.sleep(self.MESSAGE_DELETE_INTERVAL)
-            is_deleted = True
+        try:
+            async for m in channel.history(limit=limit, oldest_first=True):
+                if m.id in exclusion_ids:
+                    continue
+                if remove_range is not None and m.created_at >= remove_range:
+                    is_complete = True
+                    break
+                try:
+                    await m.delete()
+                except Exception as e:
+                    print(f"メッセージ削除で例外発生:{e}")
+                await asyncio.sleep(self.MESSAGE_DELETE_INTERVAL)
+                is_deleted = True
+        except discord.Forbidden:
+            print(f"channel_clear.message_deleteでチャンネルのメッセージ削除に失敗しました。:Forbidden guild_id={channel.guild.id}, channel_id={channel.id}")
+            return (False, False)
+        except discord.HTTPException:
+            print(f"channel_clear.message_deleteでチャンネルのメッセージ削除に失敗しました。:HTTPException guild_id={channel.guild.id}, channel_id={channel.id}")
+            return (False, False)
+        except Exception as e:
+            print(f"channel_clear.message_deleteで例外発生:{e}")
+            return (False, False)
+
         return (is_complete, is_deleted)
 
-    async def test(self):
-        print("hello")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ChannelClearCog(bot))

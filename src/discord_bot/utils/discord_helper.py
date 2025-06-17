@@ -80,6 +80,12 @@ class DiscordHelper:
                 if channel is None:
                     msg = "指定されたチャンネルが存在しません。"
                     return Err(msg)
+            except discord.InvalidData:
+                msg = "無効なチャンネルです。"
+                return Err(msg)
+            except discord.NotFound:
+                msg = "指定されたチャンネルが存在しません。"
+                return Err(msg)
             except discord.Forbidden:
                 msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
                 return Err(msg)

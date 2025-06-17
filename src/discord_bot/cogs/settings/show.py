@@ -3,7 +3,7 @@ import discord
 from discord import Interaction
 from discord import app_commands
 from discord.ext import commands
-from result import Err
+from result import Err, Ok
 from sqlalchemy.ext.asyncio import AsyncSession
 from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
@@ -71,37 +71,44 @@ class SettingsShowCog(commands.Cog):
 
         embed = discord.Embed(title=f"{guild.name}の設定一覧", description="")
 
+        # 定期削除対象チャンネルを収集
         channel_infos: list[str] = []
         ch_messages: dict[str, list[str]] = {}
         for monitoring_channel in monitoring_channels:
-            try:
-                channel = await DiscordHelper.get_or_fetch_channel_from_guild(
-                    guild, monitoring_channel.channel_id
-                )
-            except discord.Forbidden:
-                continue
-            except discord.NotFound:
-                continue
+            channel_result = await DiscordHelper.get_or_fetch_channel_from_guild(
+                guild, monitoring_channel.channel_id
+            )
+            match channel_result:
+                case Ok(ok_value):
+                    channel = ok_value
+                case Err(err_value):
+                    print(err_value)
+                    continue
+
             channel_infos.append(f"{channel.mention}: {monitoring_channel.interval}")
         if len(channel_infos) > 0:
             channels_str = "\n".join([x for x in channel_infos])
         else:
             channels_str = "なし"
+
         embed.add_field(
             name="定期削除有効チャンネル: ライフタイム",
             value=channels_str,
             inline=False,
         )
 
+        # 除外メッセージを収集
         for exclusion in exclusions:
-            try:
-                channel = await DiscordHelper.get_or_fetch_channel_from_guild(
-                    guild, exclusion.channel_id
-                )
-            except discord.Forbidden:
-                continue
-            except discord.NotFound:
-                continue
+            channel_result = await DiscordHelper.get_or_fetch_channel_from_guild(
+                guild, exclusion.channel_id
+            )
+            match channel_result:
+                case Ok(ok_value):
+                    channel = ok_value
+                case Err(err_value):
+                    print(err_value)
+                    continue
+
             try:
                 m = await channel.fetch_message(exclusion.message_id)
             except discord.Forbidden:
@@ -115,9 +122,11 @@ class SettingsShowCog(commands.Cog):
 
         msg = ""
         for ch, urls in ch_messages.items():
+            # チャンネル名:
             msg += f"- {ch}:\n"
             for url in urls:
-                msg += f" - {url}\n"
+                # メッセージURL
+                msg += f"  - {url}\n"
 
         if msg == "":
             msg = "なし"
