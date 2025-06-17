@@ -28,5 +28,14 @@ class FailedReasonCode(Enum):
     # 権限的にメッセージを削除できない
     MESSAGE_DELETE_PERMISSION_DENIED = "E0007"
 
+    # 権限的にメッセージ履歴を見れない
+    MESSAGE_READ_PERMISSION_DENIED = "E0008"
+
+    # メッセージが見つからない
+    MESSAGE_NOT_FOUND = "E0009"
+
+    # メッセージにアクセスできない
+    MESSAGE_ACCESS_DENIED = "E0010"
+
     def __str__(self):
         return self.name

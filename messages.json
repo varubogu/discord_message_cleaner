@@ -30,5 +30,17 @@
     "E0007":{
         "ja": "メッセージを削除する権限がありません。",
         "en": "You do not have permission to delete messages."
+    },
+    "E0008":{
+        "ja": "メッセージ履歴を見る権限がありません。",
+        "en": "You do not have permission to read message history."
+    },
+    "E0009":{
+        "ja": "メッセージが見つかりません。",
+        "en": "Message not found."
+    },
+    "E0010":{
+        "ja": "メッセージにアクセスできません。",
+        "en": "Message access denied."
     }
 }
