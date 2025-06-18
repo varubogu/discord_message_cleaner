@@ -11,6 +11,7 @@ WORKDIR $WORK_FOLDER
 
 COPY requirements.txt ./
 COPY src/ ./src
+COPY messages.json ./messages.json
 COPY config/ ./config
 
 ENV PYTHONPATH=${SOURCE_FOLDER}:${SOURCE_BOT_FOLDER}
