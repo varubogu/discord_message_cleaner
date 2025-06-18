@@ -32,8 +32,8 @@
         "en": "You do not have permission to delete messages."
     },
     "E0008":{
-        "ja": "メッセージ履歴を見る権限がありません。",
-        "en": "You do not have permission to read message history."
+        "ja": "メッセージを見る権限がありません。",
+        "en": "You do not have permission to read messages."
     },
     "E0009":{
         "ja": "メッセージが見つかりません。",
@@ -42,5 +42,9 @@
     "E0010":{
         "ja": "メッセージにアクセスできません。",
         "en": "Message access denied."
+    },
+    "E0011":{
+        "ja": "メッセージ履歴を見る権限がありません。",
+        "en": "You do not have permission to read message history."
     }
 }
