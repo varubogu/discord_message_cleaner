@@ -16,3 +16,6 @@ config/*
 
 # GCP API Credential
 gcp-credentials.json
+
+# messages.json
+src/discord_bot/messages.json

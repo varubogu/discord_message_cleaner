@@ -1,0 +1,12 @@
+// .vscode/tasks.json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Pre-Run copy messages.json",
+            "type": "shell",
+            "command": "cp ${workspaceFolder}/messages.json ${workspaceFolder}/src/discord_bot/messages.json",
+            "problemMatcher": []
+        }
+    ]
+}
