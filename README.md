@@ -150,6 +150,14 @@ The basic settings are summarized in the devcontainer.
 ### Debug Execution
 
 You can run the debugger directly from the "Run" tab as .vscode/launch.json is provided.
+For the database, run dev.up.sh.
+
+```bash
+sh dev.up.sh
+```
+
+The connection information for the database specified in devcontainer.json will be used.
+※It is not “.env.db.production”.
 
 ### Test Execution
 
