@@ -4,6 +4,7 @@ from result import Result, Ok, Err
 from discord.guild import Guild
 from discord.message import Message
 from discord.ext import commands
+from discord_bot.utils.failed_reason_code import FailedReasonCode
 
 class DiscordHelper:
 
@@ -12,14 +13,14 @@ class DiscordHelper:
         cls,
         user: discord.User | discord.Member,
         channel: discord.TextChannel
-    ) -> Result[None, list[str]]:
+    ) -> Result[None, list[FailedReasonCode]]:
         msg = []
         a = channel.permissions_for(user)
         if a.administrator is False:
             if a.read_message_history is False:
-                msg.append("メッセージ履歴を見る権限がありません。")
+                msg.append(FailedReasonCode.MESSAGE_READ_PERMISSION_DENIED)
             if a.manage_messages is False:
-                msg.append("メッセージを削除する権限がありません。")
+                msg.append(FailedReasonCode.MESSAGE_DELETE_PERMISSION_DENIED)
         if msg == "":
             return Ok(None)
         else:
@@ -30,20 +31,17 @@ class DiscordHelper:
         cls,
         bot: commands.Bot,
         guild_id: int,
-    ) -> Result[Guild, str]:
+    ) -> Result[Guild, FailedReasonCode]:
         guild = bot.get_guild(guild_id)
         if guild is None:
             try:
                 guild = await bot.fetch_guild(guild_id)
                 if guild is None:
-                    msg = "指定されたサーバーが存在しません。"
-                    return Err(msg)
+                    return Err(FailedReasonCode.GUILD_NOT_FOUND)
             except discord.Forbidden:
-                msg = "指定されたサーバーへのアクセス権限がこのBotにありません。"
-                return Err(msg)
+                return Err(FailedReasonCode.GUILD_ACCESS_DENIED)
             except discord.HTTPException:
-                msg = "サーバーが存在しません(404)"
-                return Err(msg)
+                return Err(FailedReasonCode.GUILD_NOT_FOUND)
         return Ok(guild)
 
     @classmethod
@@ -51,20 +49,17 @@ class DiscordHelper:
         cls,
         bot: commands.Bot,
         channel_id: int
-    ) -> Result[Any, str]:
+    ) -> Result[Any, FailedReasonCode]:
         channel = bot.get_channel(channel_id)
         if channel is None:
             try:
                 channel = await bot.fetch_channel(channel_id)
                 if channel is None:
-                    msg = "指定されたチャンネルが存在しません。"
-                    return Err(msg)
+                    return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
             except discord.Forbidden:
-                msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_ACCESS_DENIED)
             except discord.HTTPException:
-                msg = "チャンネルが存在しません(404)"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
         return Ok(channel)
 
     @classmethod
@@ -72,26 +67,21 @@ class DiscordHelper:
         cls,
         guild: Guild,
         channel_id: int
-    ) -> Result[Any, str]:
+    ) -> Result[Any, FailedReasonCode]:
         channel = guild.get_channel(channel_id)
         if channel is None:
             try:
                 channel = await guild.fetch_channel(channel_id)
                 if channel is None:
-                    msg = "指定されたチャンネルが存在しません。"
-                    return Err(msg)
+                    return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
             except discord.InvalidData:
-                msg = "無効なチャンネルです。"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
             except discord.NotFound:
-                msg = "指定されたチャンネルが存在しません。"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
             except discord.Forbidden:
-                msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_ACCESS_DENIED)
             except discord.HTTPException:
-                msg = "チャンネルが存在しません(404)"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
         return Ok(channel)
 
 
@@ -104,7 +94,7 @@ class DiscordHelper:
         message_id: Optional[int]
     ) -> Result[
         Tuple[Optional[Guild], Optional[discord.TextChannel], Optional[Message]],
-        str
+        FailedReasonCode
     ]:
         guild = None
         channel = None
@@ -121,11 +111,9 @@ class DiscordHelper:
                     case Err(err_value):
                         return Err(err_value)
             except discord.Forbidden:
-                msg = "指定されたサーバーへのアクセス権限がこのBotにありません。"
-                return Err(msg)
+                return Err(FailedReasonCode.GUILD_ACCESS_DENIED)
             except discord.HTTPException:
-                msg = "サーバーが存在しません(404)"
-                return Err(msg)
+                return Err(FailedReasonCode.GUILD_NOT_FOUND)
 
         if channel_id is None:
             channel = None
@@ -143,14 +131,11 @@ class DiscordHelper:
                     case Err(err_value):
                         return Err(err_value)
             except discord.NotFound:
-                msg = "指定されたチャンネルが存在しません。"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
             except discord.Forbidden:
-                msg = "指定されたチャンネルへのアクセス権限がこのBotにありません。"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_ACCESS_DENIED)
             except discord.HTTPException:
-                msg = "チャンネルが存在しません(404)"
-                return Err(msg)
+                return Err(FailedReasonCode.CHANNEL_NOT_FOUND)
 
         if message_id is None:
             message = None
@@ -161,13 +146,10 @@ class DiscordHelper:
                 else:
                     message = None
             except discord.NotFound:
-                msg = "指定されたメッセージが存在しません。"
-                return Err(msg)
+                return Err(FailedReasonCode.MESSAGE_NOT_FOUND)
             except discord.Forbidden:
-                msg = "指定されたメッセージのアクセス権限がこのBotにありません。"
-                return Err(msg)
+                return Err(FailedReasonCode.MESSAGE_ACCESS_DENIED)
             except discord.HTTPException:
-                msg = "メッセージが存在しません(404)"
-                return Err(msg)
+                return Err(FailedReasonCode.MESSAGE_NOT_FOUND)
         result = (guild, channel, message)
         return Ok(result)
