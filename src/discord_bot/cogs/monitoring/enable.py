@@ -1,4 +1,5 @@
 from datetime import timedelta
+import os
 from result import Ok, Err
 import discord
 from discord import Interaction, TextChannel
@@ -9,6 +10,7 @@ from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
 from discord_bot.utils.lifetime import LifeTimeUtil
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.utils.messages import SingletonMessages
 from discord_bot.utils.permission import Permission
 
 
@@ -42,6 +44,8 @@ class EnableCog(commands.Cog):
         try:
             await interaction.response.defer()
 
+            messages = await SingletonMessages.get_instance()
+
             interval_parse_result = await LifeTimeUtil.calc(lifetime)
 
             match interval_parse_result:
@@ -50,7 +54,7 @@ class EnableCog(commands.Cog):
                 case Err(err):
                     await interaction.followup.send(err, ephemeral=True)
                     return
-                
+
             interval = await LifeTimeUtil.convert_dict_to_timedelta(interval_object)
 
             if interval.total_seconds() <= 0:
@@ -61,8 +65,9 @@ class EnableCog(commands.Cog):
             permission_result = await Permission.is_message_delete_permission(interaction.user, channel)
             match permission_result:
                 case Err(err_value):
-                    msg = "\n".join(err_value)
-                    await interaction.followup.send(msg, ephemeral=True)
+                    log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"EnableCog.execute error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     return
 
             msg = f"{channel.mention}を監視対象にしますか？\n" \

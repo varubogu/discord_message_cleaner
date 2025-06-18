@@ -10,7 +10,8 @@
             "request": "launch",
             "cwd": "${workspaceFolder}/src/discord_bot",
             "module": "bot",
-            "justMyCode": true
+            "justMyCode": true,
+            "preLaunchTask": "Pre-Run copy messages.json"
         }
     ]
 }

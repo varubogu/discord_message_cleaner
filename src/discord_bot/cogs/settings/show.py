@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 import discord
 from discord import Interaction
@@ -8,7 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.utils import failed_reason_code
 from discord_bot.utils.discord_helper import DiscordHelper
+from discord_bot.utils.messages import SingletonMessages
 from discord_bot.utils.permission import Permission
 
 
@@ -33,6 +36,8 @@ class SettingsShowCog(commands.Cog):
     ):
         try:
             await interaction.response.defer()
+            messages = await SingletonMessages.get_instance()
+
             async with self.bot.db_lock:
                 async with AsyncSessionLocal() as session:
                     if channel is None:
@@ -50,8 +55,9 @@ class SettingsShowCog(commands.Cog):
                         )
                         match permission_result:
                             case Err(err_value):
-                                msg = "\n".join(err_value)
-                                await interaction.followup.send(msg, ephemeral=True)
+                                log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                                print(f"SettingsShowCog.channel_show error: {log_message}")
+                                await interaction.followup.send(display_message, ephemeral=True)
                                 return
                         embed = await self.channel_show(session, interaction, channel)
 
@@ -71,6 +77,8 @@ class SettingsShowCog(commands.Cog):
 
         embed = discord.Embed(title=f"{guild.name}の設定一覧", description="")
 
+        messages = await SingletonMessages.get_instance()
+
         # 定期削除対象チャンネルを収集
         channel_infos: list[str] = []
         ch_messages: dict[str, list[str]] = {}
@@ -79,10 +87,12 @@ class SettingsShowCog(commands.Cog):
                 guild, monitoring_channel.channel_id
             )
             match channel_result:
-                case Ok(ok_value):
-                    channel = ok_value
-                case Err(err_value):
-                    print(err_value)
+                case Ok(channel):
+                    channel: discord.TextChannel = channel
+                case Err(failed_code):
+                    log_message, display_message = await messages.get_log_and_display_message(failed_code, os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"SettingsShowCog.server_show error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     continue
 
             channel_infos.append(f"{channel.mention}: {monitoring_channel.interval}")
@@ -103,10 +113,12 @@ class SettingsShowCog(commands.Cog):
                 guild, exclusion.channel_id
             )
             match channel_result:
-                case Ok(ok_value):
-                    channel = ok_value
-                case Err(err_value):
-                    print(err_value)
+                case Ok(channel):
+                    channel: discord.TextChannel = channel
+                case Err(failed_code):
+                    log_message, display_message = await messages.get_log_and_display_message(failed_code, os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"SettingsShowCog.server_show error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     continue
 
             try:

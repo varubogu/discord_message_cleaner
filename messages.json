@@ -1,0 +1,50 @@
+{
+    "E0000":{
+        "ja": "不明な理由で失敗しました。",
+        "en": "Unknown reason for failure."
+    },
+    "E0001":{
+        "ja": "Discord API トークンが無効です。",
+        "en": "Discord API token is invalid."
+    },
+    "E0002":{
+        "ja": "Discord API レートリミットに達しました。",
+        "en": "Discord API rate limit reached."
+    },
+    "E0003":{
+        "ja": "サーバー(ギルド)が見つかりません。",
+        "en": "Server(Guild) not found."
+    },
+    "E0004":{
+        "ja": "サーバーにアクセスできません。",
+        "en": "Server access denied."
+    },
+    "E0005":{
+        "ja": "チャンネルが見つかりません。",
+        "en": "Channel not found."
+    },
+    "E0006":{
+        "ja": "チャンネルにアクセスできません。",
+        "en": "Channel access denied."
+    },
+    "E0007":{
+        "ja": "メッセージを削除する権限がありません。",
+        "en": "You do not have permission to delete messages."
+    },
+    "E0008":{
+        "ja": "メッセージを見る権限がありません。",
+        "en": "You do not have permission to read messages."
+    },
+    "E0009":{
+        "ja": "メッセージが見つかりません。",
+        "en": "Message not found."
+    },
+    "E0010":{
+        "ja": "メッセージにアクセスできません。",
+        "en": "Message access denied."
+    },
+    "E0011":{
+        "ja": "メッセージ履歴を見る権限がありません。",
+        "en": "You do not have permission to read message history."
+    }
+}
