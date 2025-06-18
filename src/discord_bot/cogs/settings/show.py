@@ -36,6 +36,8 @@ class SettingsShowCog(commands.Cog):
     ):
         try:
             await interaction.response.defer()
+            messages = await SingletonMessages.get_instance()
+
             async with self.bot.db_lock:
                 async with AsyncSessionLocal() as session:
                     if channel is None:
@@ -53,8 +55,9 @@ class SettingsShowCog(commands.Cog):
                         )
                         match permission_result:
                             case Err(err_value):
-                                msg = "\n".join(err_value)
-                                await interaction.followup.send(msg, ephemeral=True)
+                                log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                                print(f"SettingsShowCog.channel_show error: {log_message}")
+                                await interaction.followup.send(display_message, ephemeral=True)
                                 return
                         embed = await self.channel_show(session, interaction, channel)
 

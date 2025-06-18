@@ -81,8 +81,9 @@ class ExclusionAddCog(commands.Cog):
             permission_result = await Permission.is_message_read_permission(interaction.user, channel)
             match permission_result:
                 case Err(err_value):
-                    msg = "メッセージの取得に失敗しました。"
-                    await interaction.followup.send(msg, ephemeral=True)
+                    log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"ExclusionAddCog.execute error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     return
 
             mc = ExclusionMessage()

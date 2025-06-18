@@ -82,8 +82,9 @@ class ExclusionRemoveCog(commands.Cog):
             permission_result = await Permission.is_message_read_permission(interaction.user, channel)
             match permission_result:
                 case Err(err_value):
-                    msg = "メッセージの取得に失敗しました。"
-                    await interaction.followup.send(msg, ephemeral=True)
+                    log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"ExclusionRemoveCog.execute error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     return
 
             msg = f"{message.jump_url}の除外設定を解除しますか？\n" \

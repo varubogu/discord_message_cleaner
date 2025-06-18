@@ -1,3 +1,4 @@
+import os
 import discord
 from discord import Interaction
 from discord import app_commands
@@ -5,6 +6,7 @@ from discord.ext import commands
 from result import Err
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.utils.messages import SingletonMessages
 from discord_bot.utils.permission import Permission
 
 
@@ -36,11 +38,14 @@ class DisableCog(commands.Cog):
         try:
             await interaction.response.defer()
 
+            messages = await SingletonMessages.get_instance()
+
             permission_result = await Permission.is_message_delete_permission(interaction.user, channel)
             match permission_result:
                 case Err(err_value):
-                    msg = "\n".join(err_value)
-                    await interaction.followup.send(msg, ephemeral=True)
+                    log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"DisableCog.execute error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     return
 
             async with self.bot.db_lock:

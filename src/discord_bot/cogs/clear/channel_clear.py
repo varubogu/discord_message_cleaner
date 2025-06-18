@@ -1,4 +1,5 @@
 import asyncio
+import os
 from result import Ok, Err
 import discord
 from discord import Interaction, TextChannel
@@ -8,6 +9,7 @@ from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
+from discord_bot.utils.messages import SingletonMessages
 from discord_bot.utils.permission import Permission
 from discord_bot.utils.environment import get_os_environ_safety
 
@@ -44,14 +46,18 @@ class ChannelClearCog(commands.Cog):
     ):
         try:
             await interaction.response.defer()
+
+            messages = await SingletonMessages.get_instance()
+
             async with self.bot.db_lock:
                 async with AsyncSessionLocal() as session:
                     monitorings = await MonitoringChannels.select(session, channel.guild.id, channel.id)
             permission_result = await Permission.is_message_delete_permission(interaction.user, channel)
             match permission_result:
                 case Err(err_value):
-                    msg = "\n".join(err_value)
-                    await interaction.followup.send(msg, ephemeral=True)
+                    log_message, display_message = await messages.get_log_and_display_message(err_value[0], os.environ.get("MESSAGE_LANGUAGE", "en"))
+                    print(f"ChannelClearCog.execute error: {log_message}")
+                    await interaction.followup.send(display_message, ephemeral=True)
                     return
 
             msg = ""

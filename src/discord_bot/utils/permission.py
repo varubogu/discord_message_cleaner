@@ -1,6 +1,8 @@
 import discord
 from result import Result, Ok, Err
 
+from discord_bot.utils.failed_reason_code import FailedReasonCode
+
 class Permission:
 
     @classmethod
@@ -8,16 +10,16 @@ class Permission:
         cls,
         user: discord.User | discord.Member,
         channel: discord.TextChannel
-    ) -> Result[None, list[str]]:
+    ) -> Result[None, list[FailedReasonCode]]:
         message_list = []
         if isinstance(user, discord.User):
             return Ok(None)
         a = channel.permissions_for(user)
         if a.administrator is False:
             if a.read_messages is False:
-                message_list.append("チャンネルの閲覧権限がありません。")
+                message_list.append(FailedReasonCode.MESSAGE_READ_PERMISSION_DENIED)
             elif a.read_message_history is False:
-                message_list.append("メッセージ履歴を見る権限がありません。")
+                message_list.append(FailedReasonCode.MESSAGE_READ_HISTORY_PERMISSION_DENIED)
         if len(message_list) == 0:
             return Ok(None)
         else:
@@ -28,19 +30,19 @@ class Permission:
         cls,
         user: discord.User | discord.Member,
         channel: discord.TextChannel
-    ) -> Result[None, list[str]]:
+    ) -> Result[None, list[FailedReasonCode]]:
         message_list = []
         if isinstance(user, discord.User):
             return Ok(None)
         a = channel.permissions_for(user)
         if a.administrator is False:
             if a.read_messages is False:
-                message_list.append("あなたにはこのチャンネルの閲覧権限がありません。")
+                message_list.append(FailedReasonCode.MESSAGE_DELETE_PERMISSION_DENIED)
             elif a.read_message_history is False:
-                message_list.append("あなたにはこのメッセージ履歴を見る権限がありません。")
+                message_list.append(FailedReasonCode.MESSAGE_READ_HISTORY_PERMISSION_DENIED)
 
             if a.manage_messages is False:
-                message_list.append("あなたにはこのチャンネルのメッセージを削除する権限がありません。")
+                message_list.append(FailedReasonCode.MESSAGE_DELETE_PERMISSION_DENIED)
         if len(message_list) == 0:
             return Ok(None)
         else:
