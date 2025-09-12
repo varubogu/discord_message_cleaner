@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
-from discord_bot.utils import failed_reason_code
+from discord_bot.utils.failed_reason_code import FailedReasonCode
 from discord_bot.utils.discord_helper import DiscordHelper
 from discord_bot.utils.messages import SingletonMessages
 from discord_bot.utils.permission import Permission
@@ -188,6 +188,36 @@ class SettingsShowCog(commands.Cog):
             url_str = "なし"
         embed.add_field(name="除外したメッセージ", value=url_str, inline=False)
         return embed
+
+    @execute.error
+    async def execute_error(
+        self,
+        interaction: discord.Interaction,
+        error: app_commands.AppCommandError
+    ):
+        messages = await SingletonMessages.get_instance()
+
+        # 「message_cleaner_admin」ロールがコマンド使用者に無い場合
+        if isinstance(error, discord.app_commands.MissingRole):
+            _, display_message = await messages.get_log_and_display_message(
+                FailedReasonCode.NO_BOT_USAGE_PERMISSION,
+                os.environ.get("MESSAGE_LANGUAGE", "en")
+            )
+            await interaction.response.send_message(
+                display_message,
+                ephemeral=True
+            )
+        else:
+            log, display_message = await messages.get_log_and_display_message(
+                FailedReasonCode.UNKNOWN,
+                os.environ.get("MESSAGE_LANGUAGE", "en")
+            )
+
+            print(log + f":{error}")
+            await interaction.response.send_message(
+                display_message,
+                ephemeral=True
+            )
 
 
 async def setup(bot: commands.Bot):

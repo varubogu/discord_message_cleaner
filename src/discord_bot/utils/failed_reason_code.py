@@ -40,5 +40,8 @@ class FailedReasonCode(Enum):
     # 権限的にメッセージ履歴を見れない
     MESSAGE_READ_HISTORY_PERMISSION_DENIED = "E0011"
 
+    # ユーザーにBotの使用可能ロール（message_cleaner_admin）が無い
+    NO_BOT_USAGE_PERMISSION = "E0012"
+
     def __str__(self):
         return self.name

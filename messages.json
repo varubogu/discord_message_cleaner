@@ -46,5 +46,9 @@
     "E0011":{
         "ja": "メッセージ履歴を見る権限がありません。",
         "en": "You do not have permission to read message history."
+    },
+    "E0012":{
+        "ja": "Botを使用するには「message_cleaner_admin」ロールが必要です。",
+        "en": "To use the bot, the “message_cleaner_admin” role is required."
     }
 }

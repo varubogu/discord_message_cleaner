@@ -7,6 +7,7 @@ from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
 from discord_bot.utils.discord_helper import DiscordHelper
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.utils.failed_reason_code import FailedReasonCode
 from discord_bot.utils.messages import SingletonMessages
 from discord_bot.utils.permission import Permission
 from discord_bot.utils.url import UrlUtil
@@ -137,6 +138,36 @@ class ExclusionRemoveCog(commands.Cog):
         except Exception as e:
             print(e)
             await interaction.followup.send("err", ephemeral=True)
+
+    @execute.error
+    async def execute_error(
+        self,
+        interaction: Interaction,
+        error: app_commands.AppCommandError
+    ):
+        messages = await SingletonMessages.get_instance()
+
+        # 「message_cleaner_admin」ロールがコマンド使用者に無い場合
+        if isinstance(error, app_commands.MissingRole):
+            _, display_message = await messages.get_log_and_display_message(
+                FailedReasonCode.NO_BOT_USAGE_PERMISSION,
+                os.environ.get("MESSAGE_LANGUAGE", "en")
+            )
+            await interaction.response.send_message(
+                display_message,
+                ephemeral=True
+            )
+        else:
+            log, display_message = await messages.get_log_and_display_message(
+                FailedReasonCode.UNKNOWN,
+                os.environ.get("MESSAGE_LANGUAGE", "en")
+            )
+
+            print(log + f":{error}")
+            await interaction.response.send_message(
+                display_message,
+                ephemeral=True
+            )
 
 
 async def setup(bot: commands.Bot):
