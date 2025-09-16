@@ -1,9 +1,9 @@
+import asyncio
 import os
 
-import asyncio
-from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 
 # 環境変数読み込み
 dotenv_filepath = os.path.join(os.environ['CONFIG_FOLDER'], '.env')
@@ -28,6 +28,7 @@ class DiscordBot(commands.Bot):
             'cogs.clear.channel_clear',
             'cogs.exclusion.add',
             'cogs.exclusion.remove',
+            'cogs.help.help',
             'cogs.monitoring.enable',
             'cogs.monitoring.disable',
             'cogs.schedule.minute_schedule',

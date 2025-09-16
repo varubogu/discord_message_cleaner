@@ -49,6 +49,78 @@
     },
     "E0012":{
         "ja": "Botを使用するには「message_cleaner_admin」ロールが必要です。",
-        "en": "To use the bot, the “message_cleaner_admin” role is required."
+        "en": "To use the bot, the \"message_cleaner_admin\" role is required."
+    },
+    "HELP_TITLE":{
+        "ja": "Discordメッセージクリーナー - ヘルプ",
+        "en": "Discord Message Cleaner - Help"
+    },
+    "HELP_DESCRIPTION":{
+        "ja": "このBotは設定したチャンネルのメッセージを定期的に削除します。",
+        "en": "This bot periodically deletes messages in designated channels."
+    },
+    "HELP_COMMANDS_TITLE":{
+        "ja": "利用可能なコマンド",
+        "en": "Available Commands"
+    },
+    "HELP_ENABLE_DESC":{
+        "ja": "監視対象のチャンネルを設定します。メッセージは指定した期間後に削除されます。",
+        "en": "Set target channels for deletion. Messages will be deleted after the specified period."
+    },
+    "HELP_DISABLE_DESC":{
+        "ja": "チャンネルを監視対象から解除します。",
+        "en": "Remove channels from deletion targets."
+    },
+    "HELP_EXCLUDE_ADD_DESC":{
+        "ja": "メッセージを削除対象から除外します。",
+        "en": "Exclude messages from deletion by specifying the message URL or message ID."
+    },
+    "HELP_EXCLUDE_REMOVE_DESC":{
+        "ja": "除外設定を解除します。",
+        "en": "Remove exclusions."
+    },
+    "HELP_SETTINGS_DESC":{
+        "ja": "現在のサーバーで設定中の設定内容を表示します。",
+        "en": "View settings within the server."
+    },
+    "HELP_CLEAR_DESC":{
+        "ja": "チャンネル内の全メッセージを削除します。",
+        "en": "Delete all messages in a channel."
+    },
+    "HELP_SCHEDULE_DESC":{
+        "ja": "定期削除のスケジュールを設定します。",
+        "en": "Set the schedule for periodic deletion."
+    },
+    "HELP_PERMISSION_NOTE":{
+        "ja": "**注意**: 全てのコマンドには「message_cleaner_admin」ロールが必要です。",
+        "en": "**Note**: All commands require the \"message_cleaner_admin\" role."
+    },
+    "HELP_LIFETIME_EXAMPLES":{
+        "ja": "**ライフタイムの例**: `1day`, `1week`, `1hour 30min`, `90min`",
+        "en": "**Lifetime examples**: `1day`, `1week`, `1hour 30min`, `90min`"
+    },
+    "HELP_COMMAND_DESCRIPTION":{
+        "ja": "Botの使用方法とコマンド一覧を表示します。",
+        "en": "Display bot usage and command list."
+    },
+    "HELP_DESCRIPTION_LABEL":{
+        "ja": "**説明**:",
+        "en": "**Description**:"
+    },
+    "HELP_USAGE_LABEL":{
+        "ja": "**使用例**:",
+        "en": "**Usage**:"
+    },
+    "HELP_OR":{
+        "ja": "または",
+        "en": "or"
+    },
+    "HELP_FOOTER":{
+        "ja": "詳細な使用方法については、READMEファイルを参照してください。",
+        "en": "For detailed usage instructions, please refer to the README file."
+    },
+    "HELP_ERROR":{
+        "ja": "エラーが発生しました。",
+        "en": "An error occurred."
     }
 }
