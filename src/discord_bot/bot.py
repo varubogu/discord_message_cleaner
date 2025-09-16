@@ -28,6 +28,7 @@ class DiscordBot(commands.Bot):
             'cogs.clear.channel_clear',
             'cogs.exclusion.add',
             'cogs.exclusion.remove',
+            'cogs.help.help',
             'cogs.monitoring.enable',
             'cogs.monitoring.disable',
             'cogs.schedule.minute_schedule',
