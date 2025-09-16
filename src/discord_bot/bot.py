@@ -1,9 +1,9 @@
+import asyncio
 import os
 
-import asyncio
-from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 
 # 環境変数読み込み
 dotenv_filepath = os.path.join(os.environ['CONFIG_FOLDER'], '.env')
