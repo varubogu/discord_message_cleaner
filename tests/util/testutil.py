@@ -8,9 +8,9 @@ async def is_magic_method(name: str) -> bool:
 async def test_get_properties(cls) -> set[str]:
     obj = cls()
     return set(prop for prop in dir(obj)
-               if not callable(getattr(obj, prop))
-               and not prop.startswith("__")
-               and not prop.endswith("__"))
+                if not callable(getattr(obj, prop))
+                and not prop.startswith("__")
+                and not prop.endswith("__"))
 
 
 async def test_class_properties(actual_cls, expected_properties) -> None:

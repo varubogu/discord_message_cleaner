@@ -16,6 +16,9 @@ async def test_failed_reason_code_values():
     assert FailedReasonCode.MESSAGE_NOT_FOUND.value == "E0009"
     assert FailedReasonCode.MESSAGE_ACCESS_DENIED.value == "E0010"
     assert FailedReasonCode.MESSAGE_READ_HISTORY_PERMISSION_DENIED.value == "E0011"
+    assert FailedReasonCode.NO_BOT_USAGE_PERMISSION.value == "E0012"
+    assert FailedReasonCode.THREAD_ARCHIVED.value == "E0013"
+    assert FailedReasonCode.MESSAGE_DELETE_DENIED.value == "E0014"
 
 @pytest.mark.asyncio
 async def test_failed_reason_code_names():
@@ -32,6 +35,9 @@ async def test_failed_reason_code_names():
     assert str(FailedReasonCode.MESSAGE_NOT_FOUND) == "MESSAGE_NOT_FOUND"
     assert str(FailedReasonCode.MESSAGE_ACCESS_DENIED) == "MESSAGE_ACCESS_DENIED"
     assert str(FailedReasonCode.MESSAGE_READ_HISTORY_PERMISSION_DENIED) == "MESSAGE_READ_HISTORY_PERMISSION_DENIED"
+    assert str(FailedReasonCode.NO_BOT_USAGE_PERMISSION) == "NO_BOT_USAGE_PERMISSION"
+    assert str(FailedReasonCode.THREAD_ARCHIVED) == "THREAD_ARCHIVED"
+    assert str(FailedReasonCode.MESSAGE_DELETE_DENIED) == "MESSAGE_DELETE_DENIED"
 
 @pytest.mark.asyncio
 async def test_failed_reason_code_enum():
@@ -51,6 +57,9 @@ async def test_failed_reason_code_enum():
         FailedReasonCode.MESSAGE_NOT_FOUND,
         FailedReasonCode.MESSAGE_ACCESS_DENIED,
         FailedReasonCode.MESSAGE_READ_HISTORY_PERMISSION_DENIED,
+        FailedReasonCode.NO_BOT_USAGE_PERMISSION,
+        FailedReasonCode.THREAD_ARCHIVED,
+        FailedReasonCode.MESSAGE_DELETE_DENIED,
     }
     # 未テストのメンバーを検出
     untested_members = all_members - tested_members

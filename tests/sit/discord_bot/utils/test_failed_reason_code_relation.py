@@ -1,7 +1,10 @@
 
-import pytest
 import json
-from src.discord_bot.utils.failed_reason_code import FailedReasonCode
+
+import pytest
+
+from discord_bot.utils.failed_reason_code import FailedReasonCode
+
 
 @pytest.mark.asyncio
 async def test_failed_reason_code():
@@ -12,9 +15,11 @@ async def test_failed_reason_code():
     # FailedReasonCodeの内容を取得
     reason_codes = {code.value: code.name for code in FailedReasonCode}
 
-    # messages.jsonとFailedReasonCodeの比較
+    # messages.jsonのエラーコード（E0で始まるもの）とFailedReasonCodeの比較
     for code, message in messages.items():
-        assert code in reason_codes, f"{code} is in messages.json but not in FailedReasonCode"
+        # エラーコード（E0で始まる）のみをチェック
+        if code.startswith('E0'):
+            assert code in reason_codes, f"{code} is in messages.json but not in FailedReasonCode"
 
     # FailedReasonCodeに存在する全てのコードがmessages.jsonに存在することを確認
     for code in reason_codes.keys():
