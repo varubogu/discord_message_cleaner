@@ -2,7 +2,7 @@ import asyncio
 import os
 from result import Ok, Err
 import discord
-from discord import Interaction, TextChannel
+from discord import Interaction, TextChannel, VoiceChannel, Thread
 from discord import app_commands
 from discord.ext import commands
 from discord_bot.models.exclusion_message import ExclusionMessage
@@ -43,7 +43,7 @@ class ChannelClearCog(commands.Cog):
     async def execute(
             self,
             interaction: Interaction,
-            channel: discord.TextChannel
+            channel: TextChannel | VoiceChannel | Thread
     ):
         try:
             await interaction.response.defer()
@@ -80,7 +80,11 @@ class ChannelClearCog(commands.Cog):
             await interaction.followup.send("err", ephemeral=True)
 
     class TaskParameter():
-        def __init__(self, monitorings: MonitoringChannels, channel: TextChannel) -> None:
+        def __init__(
+            self,
+            monitorings: MonitoringChannels,
+            channel: TextChannel | VoiceChannel | Thread
+        ) -> None:
             self.monitorings = monitorings
             self.channel = channel
 
@@ -100,9 +104,13 @@ class ChannelClearCog(commands.Cog):
                 msg += f"\n1度に消せるのは{self.MAX_SIZE}件までです。\n続けて削除する場合はもう一度コマンドを実行してください。"
         await interaction.followup.send(msg, ephemeral=True)
 
-    async def message_delete(self, channel: TextChannel, limit: int = LOOP_DELETE_SIZE):
+    async def message_delete(
+        self,
+        channel: TextChannel | VoiceChannel | Thread,
+        limit: int = LOOP_DELETE_SIZE
+    ):
         if channel is None:
-            print(f"channel_clear.message_deleteでチャンネルが見つかりませんでした。")
+            print("channel_clear.message_deleteでチャンネルが見つかりませんでした。")
             return (False, False)
 
         async with self.bot.db_lock:

@@ -2,7 +2,7 @@ from datetime import timedelta
 import os
 from result import Ok, Err
 import discord
-from discord import Interaction, TextChannel
+from discord import Interaction, TextChannel, VoiceChannel, Thread
 from discord import app_commands
 from discord.ext import commands
 
@@ -39,7 +39,7 @@ class EnableCog(commands.Cog):
     async def execute(
             self,
             interaction: Interaction,
-            channel: discord.TextChannel,
+            channel: TextChannel | VoiceChannel | Thread,
             lifetime: str = '1day'
     ):
         try:
@@ -87,7 +87,11 @@ class EnableCog(commands.Cog):
             await interaction.followup.send("err", ephemeral=True)
 
     class TaskParameter():
-        def __init__(self, channel: TextChannel, interval: timedelta) -> None:
+        def __init__(
+            self,
+            channel: TextChannel | VoiceChannel | Thread,
+            interval: timedelta
+        ) -> None:
             self.channel = channel
             self.interval = interval
 

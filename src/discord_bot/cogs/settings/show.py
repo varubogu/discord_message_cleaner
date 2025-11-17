@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 import discord
-from discord import Interaction
+from discord import Interaction, TextChannel, VoiceChannel, Thread
 from discord import app_commands
 from discord.ext import commands
 from result import Err, Ok
@@ -32,7 +32,7 @@ class SettingsShowCog(commands.Cog):
         channel="入力任意のパラメータです。 省略した場合、サーバー内の全ての設定が表示されます。"
     )
     async def execute(
-        self, interaction: Interaction, channel: Optional[discord.TextChannel]
+        self, interaction: Interaction, channel: Optional[TextChannel | VoiceChannel | Thread]
     ):
         try:
             await interaction.response.defer()
@@ -88,7 +88,7 @@ class SettingsShowCog(commands.Cog):
             )
             match channel_result:
                 case Ok(channel):
-                    channel: discord.TextChannel = channel
+                    channel: TextChannel | VoiceChannel | Thread = channel
                 case Err(failed_code):
                     log_message, display_message = await messages.get_log_and_display_message(failed_code, os.environ.get("MESSAGE_LANGUAGE", "en"))
                     print(f"SettingsShowCog.server_show error: {log_message}")
@@ -114,7 +114,7 @@ class SettingsShowCog(commands.Cog):
             )
             match channel_result:
                 case Ok(channel):
-                    channel: discord.TextChannel = channel
+                    channel: TextChannel | VoiceChannel | Thread = channel
                 case Err(failed_code):
                     log_message, display_message = await messages.get_log_and_display_message(failed_code, os.environ.get("MESSAGE_LANGUAGE", "en"))
                     print(f"SettingsShowCog.server_show error: {log_message}")
@@ -150,7 +150,7 @@ class SettingsShowCog(commands.Cog):
         self,
         session: AsyncSession,
         interaction: Interaction,
-        channel: discord.TextChannel,
+        channel: TextChannel | VoiceChannel | Thread,
     ) -> discord.Embed:
 
         monitoring_channels = await MonitoringChannels.select(

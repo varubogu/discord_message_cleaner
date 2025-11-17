@@ -4,6 +4,7 @@ from result import Result, Ok, Err
 from discord.guild import Guild
 from discord.message import Message
 from discord.ext import commands
+from discord import TextChannel, VoiceChannel, Thread
 from discord_bot.utils.failed_reason_code import FailedReasonCode
 
 class DiscordHelper:
@@ -12,7 +13,7 @@ class DiscordHelper:
     async def is_message_delete_permission(
         cls,
         user: discord.User | discord.Member,
-        channel: discord.TextChannel
+        channel: TextChannel | VoiceChannel | Thread
     ) -> Result[None, list[FailedReasonCode]]:
         msg = []
         a = channel.permissions_for(user)
@@ -93,7 +94,7 @@ class DiscordHelper:
         channel_id: Optional[int],
         message_id: Optional[int]
     ) -> Result[
-        Tuple[Optional[Guild], Optional[discord.TextChannel], Optional[Message]],
+        Tuple[Optional[Guild], Optional[TextChannel | VoiceChannel | Thread], Optional[Message]],
         FailedReasonCode
     ]:
         guild = None

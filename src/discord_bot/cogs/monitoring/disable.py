@@ -1,6 +1,6 @@
 import os
 import discord
-from discord import Interaction
+from discord import Interaction, TextChannel, VoiceChannel, Thread
 from discord import app_commands
 from discord.ext import commands
 from result import Err
@@ -34,7 +34,7 @@ class DisableCog(commands.Cog):
     async def execute(
             self,
             interaction: Interaction,
-            channel: discord.TextChannel
+            channel: TextChannel | VoiceChannel | Thread
     ):
         try:
             await interaction.response.defer()

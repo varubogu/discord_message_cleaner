@@ -1,6 +1,6 @@
 import os
 from result import Ok, Err
-from discord import Guild, Interaction, Message, TextChannel
+from discord import Guild, Interaction, Message, TextChannel, VoiceChannel, Thread
 from discord import app_commands
 from discord.ext import commands
 from discord_bot.models.exclusion_message import ExclusionMessage
@@ -105,7 +105,11 @@ class ExclusionRemoveCog(commands.Cog):
             await interaction.followup.send("err", ephemeral=True)
 
     class TaskParameter():
-        def __init__(self, guild: Guild, channel: TextChannel, message: Message) -> None:
+        def __init__(self,
+            guild: Guild,
+            channel: TextChannel | VoiceChannel | Thread,
+            message: Message
+        ) -> None:
             self.guild = guild
             self.channel = channel
             self.message = message
