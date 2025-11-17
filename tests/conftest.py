@@ -61,11 +61,14 @@ async def clear_tables(engine: AsyncEngine):
 
     yield
 
-    # トランケートでテーブルデータをクリアし、次のテストに影響を与えない
+    # モデル定義から全テーブル名を動的に取得し、TRUNCATE
     async with engine.begin() as conn:
-        # テーブル名は models.get_metadata() から動的に取得しても良いが
-        # 固定リストの方が分かりやすいのでこちらを使用。
-        await conn.execute(text("TRUNCATE TABLE access_failures, exclusion_message, monitoring_channels RESTART IDENTITY CASCADE;"))
+        metadata = models.get_metadata()
+        table_names = [table.name for table in metadata.sorted_tables]
+        if table_names:
+            tables_csv = ', '.join(table_names)
+            sql = f"TRUNCATE TABLE {tables_csv} RESTART IDENTITY CASCADE;"
+            await conn.execute(text(sql))
 
 
 @pytest_asyncio.fixture
