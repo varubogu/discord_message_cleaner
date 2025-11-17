@@ -51,6 +51,14 @@
         "ja": "Botを使用するには「message_cleaner_admin」ロールが必要です。",
         "en": "To use the bot, the \"message_cleaner_admin\" role is required."
     },
+    "E0013":{
+        "ja": "スレッドはアーカイブ化されています。",
+        "en": "Thread is archived."
+    },
+    "E0014":{
+        "ja": "メッセージの削除に失敗しました。",
+        "en": "Failed to delete message."
+    },
     "HELP_TITLE":{
         "ja": "Discordメッセージクリーナー - ヘルプ",
         "en": "Discord Message Cleaner - Help"
