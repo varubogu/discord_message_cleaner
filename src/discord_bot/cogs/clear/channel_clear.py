@@ -1,5 +1,6 @@
 import asyncio
 import os
+from typing import Tuple
 from result import Ok, Err
 import discord
 from discord import Interaction, TextChannel, VoiceChannel, Thread
@@ -104,11 +105,26 @@ class ChannelClearCog(commands.Cog):
                 msg += f"\n1度に消せるのは{self.MAX_SIZE}件までです。\n続けて削除する場合はもう一度コマンドを実行してください。"
         await interaction.followup.send(msg, ephemeral=True)
 
+
     async def message_delete(
         self,
         channel: TextChannel | VoiceChannel | Thread,
         limit: int = LOOP_DELETE_SIZE
-    ):
+    ) -> Tuple[bool, bool]:
+        """メッセージ削除実行
+
+        メッセージ削除対象外（lifetimeがきれていない、除外ルール）以外のメッセージを削除する
+        削除は最大でパラメータのlimitの件数まで行われる
+
+        Args:
+            channel (TextChannel | VoiceChannel | Thread): 削除対象のチャンネル
+            limit (int, optional): チャンネルごとに削除を行う件数の最大値。未指定時は環境変数から取得
+
+        Returns:
+            Tuple[bool, bool]:
+                [bool 1]is_complete すべてのメッセージを削除し終えたか
+                [bool 2]is_deleted 1件以上削除したか
+        """
         if channel is None:
             print("channel_clear.message_deleteでチャンネルが見つかりませんでした。")
             return (False, False)
