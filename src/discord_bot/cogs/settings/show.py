@@ -207,6 +207,18 @@ class SettingsShowCog(commands.Cog):
                 display_message,
                 ephemeral=True
             )
+        elif isinstance(error, discord.app_commands.TransformerError):
+            e: discord.app_commands.TransformerError = error
+            channel_id = e.value
+            _, display_message = await messages.get_log_and_display_message(
+                FailedReasonCode.CHANNEL_ACCESS_DENIED,
+                os.environ.get("MESSAGE_LANGUAGE", "en")
+            )
+            display_message += f": {channel_id}"
+            await interaction.response.send_message(
+                display_message,
+                ephemeral=True
+            )
         else:
             log, display_message = await messages.get_log_and_display_message(
                 FailedReasonCode.UNKNOWN,
