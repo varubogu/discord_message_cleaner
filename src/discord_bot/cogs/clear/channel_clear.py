@@ -9,6 +9,7 @@ from discord.ext import commands
 from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.session import AsyncSessionLocal
+from discord_bot.types.message_delete_result import MessageDeleteResult
 from discord_bot.ui.dialogs.confirm_dialog import ConfirmDialog
 from discord_bot.utils.failed_reason_code import FailedReasonCode
 from discord_bot.utils.messages import SingletonMessages
@@ -95,13 +96,13 @@ class ChannelClearCog(commands.Cog):
 
         channel = parameter.channel
 
-        (is_complete, is_deleted) = await self.message_delete(channel, self.MAX_SIZE)
+        result = await self.message_delete(channel, self.MAX_SIZE)
 
-        if not is_deleted:
+        if not result.is_deleted:
             msg = "削除対象がありませんでした。"
         else:
             msg = "削除が完了しました。"
-            if not is_complete:
+            if not result.is_max_deleted:
                 msg += f"\n1度に消せるのは{self.MAX_SIZE}件までです。\n続けて削除する場合はもう一度コマンドを実行してください。"
         await interaction.followup.send(msg, ephemeral=True)
 
@@ -110,7 +111,7 @@ class ChannelClearCog(commands.Cog):
         self,
         channel: TextChannel | VoiceChannel | Thread,
         limit: int = LOOP_DELETE_SIZE
-    ) -> Tuple[bool, bool]:
+    ) -> MessageDeleteResult:
         """メッセージ削除実行
 
         メッセージ削除対象外（lifetimeがきれていない、除外ルール）以外のメッセージを削除する
@@ -121,9 +122,7 @@ class ChannelClearCog(commands.Cog):
             limit (int, optional): チャンネルごとに削除を行う件数の最大値。未指定時は環境変数から取得
 
         Returns:
-            Tuple[bool, bool]:
-                [bool 1]is_complete すべてのメッセージを削除し終えたか
-                [bool 2]is_deleted 1件以上削除したか
+            MessageDeleteResult: メッセージ削除結果
         """
         if channel is None:
             print("channel_clear.message_deleteでチャンネルが見つかりませんでした。")
@@ -143,6 +142,7 @@ class ChannelClearCog(commands.Cog):
 
         is_complete = False # ライフタイムと除外メッセージ以外の全てを削除しおえたか
         is_deleted = False # 1件以上削除したか
+        delete_count = 0
         try:
             async for m in channel.history(limit=limit, oldest_first=True):
                 if m.id in exclusion_ids:
@@ -152,21 +152,24 @@ class ChannelClearCog(commands.Cog):
                     break
                 try:
                     await m.delete()
+                    delete_count += 1
                 except Exception as e:
                     print(f"メッセージ削除で例外発生:{e}")
+                    raise e
                 await asyncio.sleep(self.MESSAGE_DELETE_INTERVAL)
                 is_deleted = True
         except discord.Forbidden:
             print(f"channel_clear.message_deleteでチャンネルのメッセージ削除に失敗しました。:Forbidden guild_id={channel.guild.id}, channel_id={channel.id}")
-            return (False, False)
+            return MessageDeleteResult(False, False, False, False, delete_count)
         except discord.HTTPException:
             print(f"channel_clear.message_deleteでチャンネルのメッセージ削除に失敗しました。:HTTPException guild_id={channel.guild.id}, channel_id={channel.id}")
-            return (False, False)
+            return MessageDeleteResult(False, False, False, False, delete_count)
         except Exception as e:
             print(f"channel_clear.message_deleteで例外発生:{e}")
-            return (False, False)
+            return MessageDeleteResult(False, False, False, False, delete_count)
 
-        return (is_complete, is_deleted)
+        is_max_deleted = (delete_count == limit)
+        return MessageDeleteResult(True, is_complete, is_max_deleted, is_deleted, delete_count)
 
     @execute.error
     async def execute_error(

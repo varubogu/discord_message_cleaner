@@ -2,6 +2,7 @@
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.ext.asyncio import AsyncConnection
 
+from discord_bot.models.access_failures import AccessFailures
 from discord_bot.models.exclusion_message import ExclusionMessage
 from discord_bot.models.monitoring_channels import MonitoringChannels
 from discord_bot.models.model_base import ModelBase
@@ -33,6 +34,7 @@ def get_metadata():
 class TableNameMapping:
 
     __CLASSES__ = [
+            AccessFailures,
             ExclusionMessage,
             MonitoringChannels
 

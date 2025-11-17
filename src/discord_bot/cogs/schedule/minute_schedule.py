@@ -6,6 +6,8 @@ from typing import Optional, Sequence, Tuple
 from discord.ext import commands, tasks
 from result import Err, Ok
 from sqlalchemy.ext.asyncio import AsyncSession
+from discord_bot.models.access_failures import AccessFailures
+from discord_bot.types.message_delete_result import MessageDeleteResult
 from discord_bot.utils.environment import get_os_environ_safety
 from discord_bot.utils.discord_helper import DiscordHelper
 from discord_bot.models.monitoring_channels import MonitoringChannels
@@ -23,6 +25,7 @@ class MinuteSchedule(commands.Cog):
         self.bot = bot
         self.cleaner: Optional[ChannelClearCog] = None
         self.CHANNEL_DELETE_INTERVAL = get_os_environ_safety('CHANNEL_DELETE_INTERVAL', int, 10)
+        self.MESSAGE_DELETE_FAILURES = get_os_environ_safety('MESSAGE_DELETE_FAILURES', int, 3)
 
     async def cog_load(self):
         self.loop.start()
@@ -99,8 +102,58 @@ class MinuteSchedule(commands.Cog):
                         continue
 
             if self.cleaner is not None and channel is not None:
-                (is_complete, is_deleted) = await self.cleaner.message_delete(channel)
+                result = await self.cleaner.message_delete(channel)
+                if result.result:
+                    await self.after_message_delete_success(session, now, monitoring, result)
+                else:
+                    await self.after_message_delete_failure(session, now, monitoring, result)
+            else:
+                print("minute_schedule.inner_loopにてself.cleaner.message_deleteが実行できませんでした。")
             await asyncio.sleep(self.CHANNEL_DELETE_INTERVAL)
+
+
+
+    async def after_message_delete_success(
+            self,
+            session: AsyncSession,
+            now: datetime,
+            monitoring: MonitoringChannels,
+            result: MessageDeleteResult
+    ):
+        failure_count = await AccessFailures.count_channel(session, monitoring.guild_id, monitoring.channel_id)
+
+        if failure_count > 0:
+            print(f"削除成功のためメッセージ削除失敗カウントをリセット:guild_id={monitoring.guild_id}, channel_id={monitoring.channel_id}")
+            await AccessFailures.reset_channel(session, monitoring.guild_id, monitoring.channel_id)
+            await session.commit()
+
+    async def after_message_delete_failure(
+            self,
+            session: AsyncSession,
+            now: datetime,
+            monitoring: MonitoringChannels,
+            result: MessageDeleteResult
+    ):
+        if result.is_deleted is False:
+            print(f"メッセージ削除失敗をカウント:guild_id={monitoring.guild_id}, channel_id={monitoring.channel_id}")
+
+            af = AccessFailures()
+            af.guild_id = monitoring.guild_id
+            af.channel_id = monitoring.channel_id
+            af.failed_at = now
+            af.failed_reason_code = str(FailedReasonCode.MESSAGE_DELETE_DENIED)
+            af.failed_reason = "メッセージの削除に失敗"
+
+            await af.insert(session)
+            await session.commit()
+
+            failure_count = await AccessFailures.count_channel(session, af.guild_id, af.channel_id)
+
+            if failure_count >= self.MESSAGE_DELETE_FAILURES:
+                print(f"メッセージ削除失敗カウント超過により監視対象から削除:guild_id={monitoring.guild_id}, channel_id={monitoring.channel_id}")
+                await monitoring.delete(session)
+                await AccessFailures.reset_channel(session, af.guild_id, af.channel_id)
+                await session.commit()
 
 
 async def setup(bot: commands.Bot):

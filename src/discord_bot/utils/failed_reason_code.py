@@ -43,5 +43,11 @@ class FailedReasonCode(Enum):
     # ユーザーにBotの使用可能ロール（message_cleaner_admin）が無い
     NO_BOT_USAGE_PERMISSION = "E0012"
 
+    # スレッドはアーカイブ化されている
+    THREAD_ARCHIVED = "E0013"
+
+    # メッセージ削除失敗
+    MESSAGE_DELETE_DENIED = "E0014"
+
     def __str__(self):
         return self.name

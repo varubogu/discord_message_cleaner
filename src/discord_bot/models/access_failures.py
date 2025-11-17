@@ -12,16 +12,15 @@ class AccessFailures(ModelBase):
     __tablename__ = 'access_failures'
     __table_args__ = (
         {'comment': 'サーバーにアクセスできなかったサーバーID、チャンネルIDを記憶する場所'},
-        Index('ix_access_failures_guild', 'guild_id', 'failed_at', 'failed_reason_code'),
-        Index('ix_access_failures_channel', 'guild_id', 'channel_id', 'failed_at', 'failed_reason_code'),
+        # Index('ix_access_failures_guild', 'guild_id', 'failed_at', 'failed_reason_code'),
+        # Index('ix_access_failures_channel', 'guild_id', 'channel_id', 'failed_at', 'failed_reason_code'),
     )
 
-    # サーバーID
-    id = Column(BigInteger, primary_key=True, comment="ID")
+    id = Column(BigInteger, primary_key=True, comment="ID", autoincrement=True)
     guild_id = Column(BigInteger, comment="サーバーID", nullable=False)
     channel_id = Column(BigInteger, comment="チャンネルID", nullable=True)
     failed_at = Column(DateTime, comment="失敗した日時", nullable=False)
-    failed_reason_code = Column(BigInteger, comment="失敗理由コード", nullable=False)
+    failed_reason_code = Column(String, comment="失敗理由コード", nullable=False)
     failed_reason = Column(String, comment="失敗理由", nullable=False)
 
 
@@ -63,8 +62,8 @@ class AccessFailures(ModelBase):
         session: AsyncSession,
         guild_id: int,
         channel_id: int
-    ):
-        """チャンネルにアクセスできなかったチャンネルIDの数を取得する
+    ) -> int:
+        """チャンネルにアクセスできなかった回数を取得する
 
         Args:
             session (AsyncSession): セッション
@@ -80,7 +79,11 @@ class AccessFailures(ModelBase):
                 AccessFailures.channel_id == channel_id
             )
         )
-        return result.scalar()
+        failure_count = result.scalar()
+        if failure_count is None:
+            return -1
+        else:
+            return failure_count
 
     @classmethod
     async def reset_guild(
@@ -108,7 +111,7 @@ class AccessFailures(ModelBase):
         guild_id: int,
         channel_id: int
     ):
-        """サーバーにアクセスできなかったサーバーIDの数をリセットする
+        """サーバーにアクセスできなかったチャンネルの数をリセットする
 
         Args:
             session (AsyncSession): セッション
@@ -121,4 +124,3 @@ class AccessFailures(ModelBase):
                 AccessFailures.channel_id == channel_id
             )
         )
-
