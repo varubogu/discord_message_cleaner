@@ -15,7 +15,7 @@ if [ ! "$(docker ps -q -f name=dev-db)" ]; then
     # コンテナの起動
     docker run -d \
         --name dev-db \
-        -v pgdata:/var/lib/postgresql/data \
+        -v pgdata:/var/lib/postgresql \
         -e POSTGRES_USER=${DBUSER} \
         -e POSTGRES_PASSWORD=${DBPASSWORD} \
         -e POSTGRES_DB=${DBDATABASE} \
