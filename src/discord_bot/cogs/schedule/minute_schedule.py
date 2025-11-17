@@ -98,7 +98,8 @@ class MinuteSchedule(commands.Cog):
                     else:
                         continue
 
-            await self.cleaner.message_delete(channel)
+            if self.cleaner is not None and channel is not None:
+                (is_complete, is_deleted) = await self.cleaner.message_delete(channel)
             await asyncio.sleep(self.CHANNEL_DELETE_INTERVAL)
 
 
