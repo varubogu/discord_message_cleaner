@@ -16,7 +16,7 @@ def auto001_load_env():
     load_dotenv(override=True, dotenv_path=env_path)
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture
 async def engine():
     """テストDBエンジンを生成する
 
@@ -40,18 +40,36 @@ async def engine():
 
 @pytest_asyncio.fixture
 async def create_temp_table(engine: AsyncEngine):
-    """テストDBにテーブルを一時的に作成する
+    """テストDBにテーブルをセッション単位で作成する。
 
-    Args:
-        engine (Engine): テストDBエンジン
+    個別テストでの DDL（create/drop）が並行して実行されると
+    `asyncpg` の "another operation is in progress" エラーを招くため、
+    テーブル作成/削除はセッション単位で行い、各テストの後処理は
+    データ削除（TRUNCATE）で代替します。
     """
     await models.init_db_from_engine(engine)
-    yield
-    await models.drop_db_from_engine(engine)
+    try:
+        yield
+    finally:
+        await models.drop_db_from_engine(engine)
 
 
 @pytest_asyncio.fixture
-async def async_db_session(engine, create_temp_table):
+async def clear_tables(engine: AsyncEngine):
+    """各テスト後にテーブルのデータを削除して状態をリセットするフィクスチャ。"""
+    from sqlalchemy import text
+
+    yield
+
+    # トランケートでテーブルデータをクリアし、次のテストに影響を与えない
+    async with engine.begin() as conn:
+        # テーブル名は models.get_metadata() から動的に取得しても良いが
+        # 固定リストの方が分かりやすいのでこちらを使用。
+        await conn.execute(text("TRUNCATE TABLE access_failures, exclusion_message, monitoring_channels RESTART IDENTITY CASCADE;"))
+
+
+@pytest_asyncio.fixture
+async def async_db_session(engine, create_temp_table, clear_tables):
     """DBセッションを生成する
 
     Args:
@@ -69,7 +87,7 @@ async def async_db_session(engine, create_temp_table):
         await async_session.close()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def event_loop():
     """pytest-asyncioで使用するasyncio.event_loop
         pytest-asyncioの標準のevent_loopを上書きすることで
