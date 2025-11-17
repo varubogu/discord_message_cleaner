@@ -71,7 +71,7 @@ class AccessFailures(ModelBase):
             channel_id (int): 対象チャンネルID
 
         Returns:
-            int: 引数のチャンネルがアクセスできなかった回数
+            int: 引数のチャンネルがアクセスできなかった回数（0以上）※異常時は-1
         """
         result = await session.execute(
             select(func.count()).where(
