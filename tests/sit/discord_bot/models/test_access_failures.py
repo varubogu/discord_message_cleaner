@@ -77,9 +77,9 @@ async def test_access_failures_count_channel_not_found(async_db_session):
     guild_id = 444444444
     channel_id = 555555555
 
-    # レコードが存在しない場合、-1を返す
+    # レコードが存在しない場合、0を返す（異常時は-1だが通常時あり得ない）
     count = await AccessFailures.count_channel(async_db_session, guild_id, channel_id)
-    assert count == -1
+    assert count == 0
 
 
 @pytest.mark.asyncio
@@ -140,7 +140,7 @@ async def test_access_failures_reset_channel(async_db_session):
 
     # リセット後の確認
     count_after = await AccessFailures.count_channel(async_db_session, guild_id, channel_id)
-    assert count_after == -1
+    assert count_after == 0
 
 
 @pytest.mark.asyncio
@@ -189,5 +189,5 @@ async def test_access_failures_guild_and_channel_isolation(async_db_session):
     channel_2_count_after = await AccessFailures.count_channel(async_db_session, guild_id, channel_id_2)
 
     assert guild_count_after == 1  # ギルドレベルは影響を受けない
-    assert channel_1_count_after == -1  # リセット対象のチャンネル
+    assert channel_1_count_after == 0  # リセット対象のチャンネル
     assert channel_2_count_after == 1  # 他のチャンネルは影響を受けない
