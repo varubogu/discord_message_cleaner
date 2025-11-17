@@ -1,12 +1,13 @@
 import asyncio
 import os
+
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
-
-from discord_bot import models
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
+
+from discord_bot import models
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -15,8 +16,8 @@ def auto001_load_env():
     load_dotenv(override=True, dotenv_path=env_path)
 
 
-@pytest.fixture(scope="session")
-def engine():
+@pytest_asyncio.fixture(scope="session")
+async def engine():
     """テストDBエンジンを生成する
 
     Returns:
@@ -30,8 +31,11 @@ def engine():
 
     URL = f'postgresql+asyncpg://{DBUSER}:{DBPASSWORD}@{DBHOST}/{DBDATABASE}'
     engine = create_async_engine(URL, echo=True)
-    yield engine
-    engine.sync_engine.dispose()
+    try:
+        yield engine
+    finally:
+        # AsyncEngine は非同期で dispose する
+        await engine.dispose()
 
 
 @pytest_asyncio.fixture
@@ -57,8 +61,12 @@ async def async_db_session(engine, create_temp_table):
         AsyncSession: DBセッション
     """
     async_session = AsyncSession(bind=engine)
-    yield async_session
-    async_session.close_all()
+    try:
+        yield async_session
+    finally:
+        # 正しいクリーンアップ: AsyncSession を閉じる
+        # AsyncSession.close() は非同期コンテキスト内で await 可能な実装のため await する
+        await async_session.close()
 
 
 @pytest.fixture(scope='session')
