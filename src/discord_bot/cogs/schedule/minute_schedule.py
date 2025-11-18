@@ -154,6 +154,9 @@ class MinuteSchedule(commands.Cog):
                 await monitoring.delete(session)
                 await AccessFailures.reset_channel(session, af.guild_id, af.channel_id)
                 await session.commit()
+            else:
+                print(f"メッセージ削除失敗数:{failure_count}回目  guild_id={monitoring.guild_id}, channel_id={monitoring.channel_id}")
+
 
 
 async def setup(bot: commands.Bot):
