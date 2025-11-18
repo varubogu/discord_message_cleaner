@@ -102,7 +102,7 @@ class ChannelClearCog(commands.Cog):
             msg = "削除対象がありませんでした。"
         else:
             msg = "削除が完了しました。"
-            if not result.is_max_deleted:
+            if result.is_max_deleted:
                 msg += f"\n1度に消せるのは{self.MAX_SIZE}件までです。\n続けて削除する場合はもう一度コマンドを実行してください。"
         await interaction.followup.send(msg, ephemeral=True)
 
