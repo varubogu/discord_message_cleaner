@@ -1,0 +1,51 @@
+networks:
+  dmc-network:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production-image
+    restart: unless-stopped
+    env_file:
+      - ./config/.env
+      - ./config/.env.db.production
+    environment:
+      DBHOST: db
+    networks:
+      - dmc-network
+    depends_on:
+      db:
+        condition: service_healthy
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: postgres:18.1
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${DBUSER}
+      POSTGRES_PASSWORD: ${DBPASSWORD}
+      POSTGRES_DB: ${DBDATABASE}
+    env_file:
+      - ./config/.env.db.production
+    networks:
+      - dmc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DBUSER} -d ${DBDATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:

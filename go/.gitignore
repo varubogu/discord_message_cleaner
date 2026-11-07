@@ -1,0 +1,10 @@
+# build output
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+
+# environment
+config/*
+!config/*.example
